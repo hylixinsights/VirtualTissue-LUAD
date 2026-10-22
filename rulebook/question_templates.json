@@ -1,0 +1,196 @@
+{
+ "$schema": "./question_templates.schema.json",
+ "templates_version": "1.0.0",
+ "rulebook_version": "1.0.0",
+ "summary": "Jev `questions` blocks, one per decision domain. The engine selects a template by rule.jev_question_template, substitutes {{placeholders}} from the cell record, and POSTs it to /v1/systemone together with the projected `state`. Option keys in a choice template must match the engine's allowed_actions exactly, because Choice probabilities are keyed by option name.",
+
+ "authoring_rules": [
+  "Describe situations, not degrees. A Score level reads as a state of the world the model can match against, never as 'moderately high'.",
+  "Never ask Jev for a rate, a probability of a future measured event, a concentration, or a time interval. Ask which behaviour is most plausible now, among options code has already validated.",
+  "Never ask Jev to resolve identity, decide death, or infer a value the engine marked unobservable_by_design.",
+  "Restate the measurement caveat inside `instructions` whenever a caveated quantity appears in the state, because the model sees only what the state carries.",
+  "Option keys are stable identifiers. Renaming one changes the returned probability keys and breaks the audit trail.",
+  "Independent questions may share a request; their answers do not condition on each other."
+ ],
+
+ "placeholders": {
+  "{{cell_type_candidates}}": "human-readable list of identity candidates with their source columns",
+  "{{n_contacts}}": "number of contacts at gap <= 1 um",
+  "{{target_type_candidates}}": "identity candidates of the contact target",
+  "{{interface_um}}": "shared interface length with the target, in um",
+  "{{dist_tumor_um}}": "polygon gap to the nearest tumour cell, in um",
+  "{{dist_lymphoid_um}}": "distance to the nearest lymphoid core, in um",
+  "{{horizon}}": "engine.decision_horizon label",
+  "{{perturbation_list}}": "names of active perturbations, or 'none'"
+ },
+
+ "templates": {
+
+  "contact_behavior.cd8_at_tumor_interface": {
+   "decision_domain": "contact_behavior",
+   "rule_ids": ["CD8_COGNATE_CONTACT_DEGRANULATION"],
+   "question_key": "contact_action",
+   "question": {
+    "type": "choice",
+    "instructions": "A cytotoxic CD8 T cell is in direct membrane contact with a tumour cell across a {{interface_um}} um interface. The engine has already verified lineage, viability, contact geometry and effector machinery, and has supplied the recognition state explicitly in `state` rather than inferring it from RNA. Choose the most plausible behaviour at this interface during {{horizon}}. Judge behaviour only: do not infer whether the target dies, do not estimate a rate, and do not assign a biological duration. The cytotoxicity signature in `state` is a lineage-confounded rank, not a measure of killing capacity.",
+    "criteria": {
+     "degranulate_at_contact_target": "Release a cytotoxic pulse into the contacted target now. Inhibitory input, if present in `state`, lowers the plausibility of this without ruling it out.",
+     "maintain_contact_without_degranulation": "Stay engaged at this interface without releasing a cytotoxic pulse during this step.",
+     "disengage": "End this contact during this step without releasing a cytotoxic pulse."
+    }
+   }
+  },
+
+  "contact_behavior.apc_at_t_interface": {
+   "decision_domain": "contact_behavior",
+   "rule_ids": ["MACROPHAGE_PRESENTS_MHCII_TO_CD4", "APC_CTLA4_COSTIM_WITHDRAWAL"],
+   "question_key": "apc_interface_action",
+   "question": {
+    "type": "choice",
+    "instructions": "An antigen-presenting cell ({{cell_type_candidates}}) is in direct membrane contact with a T cell ({{target_type_candidates}}) across a {{interface_um}} um interface. MHC-II and CD74 are detected in the presenting cell and TCR-complex transcripts in the T cell, so the presentation machinery is measured; the displayed peptide is unknown and no antigen specificity may be assumed. Choose the most plausible behaviour at this interface during {{horizon}}. Judge behaviour only: do not infer T-cell activation outcome, clonal expansion, or a time interval.",
+    "criteria": {
+     "present_with_costimulation": "Hold the interface and present peptide-MHC-II together with CD80/CD86 costimulation.",
+     "present_without_costimulation": "Hold the interface and present peptide-MHC-II while costimulation stays low or withdrawn, for example where CTLA-4 is detected on the T cell.",
+     "maintain_contact_without_presentation": "Stay engaged without engaging the presentation programme this step.",
+     "disengage": "End this contact during this step."
+    }
+   }
+  },
+
+  "contact_behavior.macrophage_clearance": {
+   "decision_domain": "contact_behavior",
+   "rule_ids": ["MACROPHAGE_EFFEROCYTOSIS"],
+   "question_key": "clearance_action",
+   "question": {
+    "type": "choice",
+    "instructions": "A macrophage is in direct membrane contact with a target the engine has marked as apoptotic or dead. Processing capacity is finite and is reported in `state`. Choose the most plausible behaviour during {{horizon}}. Do not infer how much debris is cleared or how long clearance takes.",
+    "criteria": {
+     "efferocytose_target": "Engulf the apoptotic target at this interface now.",
+     "maintain_contact_without_engulfment": "Stay engaged without engulfing this step, for example when processing capacity is already committed.",
+     "disengage": "End this contact and leave the target for another phagocyte."
+    }
+   }
+  },
+
+  "migration.positional_behaviour": {
+   "decision_domain": "migration",
+   "rule_ids": ["B_FOLLICULAR_POSITIONING"],
+   "question_key": "positional_behaviour",
+   "question": {
+    "type": "choice",
+    "instructions": "A cell ({{cell_type_candidates}}) holds {{n_contacts}} membrane contacts in a fully packed tissue: there is no free space, so moving means displacing one of its current partners. The nearest lymphoid core is {{dist_lymphoid_um}} um away and the nearest tumour cell {{dist_tumor_um}} um away. Choose the most plausible positional behaviour during {{horizon}}, using only the measured contacts and distances in `state`. Judge position only: do not infer effector function, differentiation, secretion, or a biological duration.",
+    "criteria": {
+     "hold_position": "Keep the current interfaces without reorganising them this step.",
+     "displace_toward_lymphoid_core": "Push against a partner in the direction of the lymphoid core.",
+     "displace_toward_tumour_front": "Push against a partner in the direction of the tumour front.",
+     "reorganise_interfaces_locally": "Stay in place but shift interface area between existing partners, without net displacement."
+    }
+   }
+  },
+
+  "secretion.matrix_programme": {
+   "decision_domain": "secretion",
+   "rule_ids": ["CAF_TUMOR_INTERFACE_MATRIX"],
+   "question_key": "matrix_programme",
+   "question": {
+    "type": "score",
+    "instructions": "Rate how well the stated context supports an active matrix-deposition programme in this fibroblast or CAF. This is a programme judgement, not a deposition rate, not an amount of collagen, and not the probability of a future measured event. The matrix-related signature in `state`, if present, is a lineage-confounded rank on a panel that covers a small fraction of the gene set; treat it as weak corroboration only.",
+    "criteria": [
+     "The cell sits away from any epithelial interface, its matrix transcripts are not detected, and nothing in the neighbourhood calls for remodelling.",
+     "The cell is near stromal partners and detects some matrix transcripts, but has no tumour interface and no stated remodelling stimulus.",
+     "The cell holds a direct interface with a tumour cell and detects matrix transcripts, the configuration that dominates the tumour rim in this section.",
+     "The cell holds a large tumour interface, detects matrix transcripts, and a declared perturbation in `state` is pushing stromal activation."
+    ]
+   }
+  },
+
+  "secretion.vegfa_programme": {
+   "decision_domain": "secretion",
+   "rule_ids": ["TUMOR_VEGFA_SECRETION"],
+   "question_key": "vegfa_programme",
+   "question": {
+    "type": "score",
+    "instructions": "Rate how well the stated context supports an active VEGFA secretion programme in this cell. VEGFA transcript detection is reported in `state` and is a measured quantity; the oxygen field, if present, is a declared scenario construct with no measured counterpart in this specimen and carries no physical units. Judge the programme only: this is not a secretion rate, not a concentration, and not a prediction about vessels.",
+    "criteria": [
+     "VEGFA is not detected in this cell and no declared stress field is acting on it.",
+     "VEGFA is detected but the cell sits close to vasculature and no declared stress field is acting on it.",
+     "VEGFA is detected and the cell sits far from any endothelial partner, or a declared hypoxia scenario is acting on it.",
+     "VEGFA is detected, the cell is far from vasculature, and a declared hypoxia scenario is acting on it at the same time."
+    ]
+   }
+  },
+
+  "secretion.ig_programme": {
+   "decision_domain": "secretion",
+   "rule_ids": ["PLASMA_CELL_SECRETION"],
+   "question_key": "ig_programme",
+   "question": {
+    "type": "score",
+    "instructions": "Rate how well the stated context supports an active immunoglobulin secretion programme in this plasma cell. No clonal or affinity state exists in this dataset, so nothing here concerns antibody specificity or antitumour activity. A high ER-stress rank in a plasma cell reflects the secretory unfolded-protein response and must not be read as terminal damage.",
+    "criteria": [
+     "The secretory identity transcripts are not detected and the identity call is contested between sources.",
+     "Secretory transcripts are detected but the identity call is contested between the two annotation sources.",
+     "Secretory transcripts are detected, both annotation sources agree, and the cell sits among lymphoid partners.",
+     "Secretory transcripts are detected, both sources agree, the cell sits in a plasma-cell-rich aggregate, and its secretory-stress rank is high within its own cell type."
+    ]
+   }
+  },
+
+  "stress_adaptation.hypoxia_response": {
+   "decision_domain": "stress_adaptation",
+   "rule_ids": ["HYPOXIA_ADAPTATION"],
+   "question_key": "hypoxia_adaptation",
+   "question": {
+    "type": "score",
+    "instructions": "A declared hypoxia scenario is acting on this cell. The oxygen value in `state` is a dimensionless scenario construct seeded from distance to the nearest endothelial cell; this specimen contains no oxygen measurement and the canonical hypoxia-response genes are absent from the panel. Rate how strongly the stated context supports an adaptive metabolic response. Judge adaptation only: do not infer death, do not infer a metabolic flux, and do not treat glycolysis and respiration as mutually exclusive.",
+    "criteria": [
+     "The cell sits adjacent to vasculature under the declared field and shows no stress-associated rank elevation.",
+     "The cell sits at intermediate distance from vasculature and its stress-associated ranks sit near the middle of its own cell type.",
+     "The cell sits far from any endothelial partner under a strong declared field, with stress-associated ranks high within its own cell type.",
+     "The cell sits far from vasculature under a strong declared field, its stress-associated ranks are high within its type, and it also carries a declared resistance or treatment scenario that changes its metabolic dependencies."
+    ]
+   }
+  },
+
+  "cycle.permissive_context": {
+   "decision_domain": "cycle",
+   "rule_ids": ["TUMOR_CYCLE_PERMISSIVE"],
+   "question_key": "cycle_permissive",
+   "question": {
+    "type": "noul",
+    "instructions": "Is the stated context permissive for this tumour cell to continue progressing through the cell cycle during {{horizon}}? The cycle itself is a timed engine state machine; you are judging the context, not whether division occurs. Note that in this specimen the proliferation signature does not separate the proliferating tumour label from the non-proliferating one, so it carries no weight here. Active perturbations: {{perturbation_list}}.",
+    "criteria": {
+     "true": "Neighbours can be displaced, resources are reported sufficient, and no declared stress or treatment scenario is opposing progression.",
+     "false": "The cell is hemmed in with no displaceable partner, resources are reported insufficient, or a declared stress or treatment scenario is opposing progression."
+    }
+   }
+  },
+
+  "differentiation.endothelial_sprout": {
+   "decision_domain": "differentiation",
+   "rule_ids": ["ENDOTHELIAL_SPROUTING"],
+   "question_key": "sprout_decision",
+   "question": {
+    "type": "choice",
+    "instructions": "An endothelial cell detecting KDR sits in a declared angiogenesis scenario with a VEGFA field value supplied in `state`. The field is a dimensionless scenario construct. The tissue is fully packed, so extending geometry requires displacing neighbouring cells. Choose the most plausible behaviour during {{horizon}}. Extending geometry does not create perfusion: whether a new segment carries oxygen is decided elsewhere and must not be assumed here.",
+    "criteria": {
+     "initiate_sprout": "Begin extending vascular geometry into the neighbouring tissue, displacing partners.",
+     "maintain_vessel_wall": "Hold the current barrier configuration without extending geometry.",
+     "increase_adhesion_receptivity": "Stay in place but raise adhesion receptivity at the existing interfaces, without extending geometry."
+    }
+   }
+  }
+ },
+
+ "worked_multi_question_request": {
+  "description": "Independent domains for one cell in a single request. Their answers do not condition on each other, which is exactly why migration and secretion may be asked together while two mutually exclusive contact actions may not.",
+  "example": {
+   "model": "jev-latest",
+   "state": "<projected per jev.state_projection in rulebook.json>",
+   "questions": {
+    "positional_behaviour": {"$ref": "#/templates/migration.positional_behaviour/question"},
+    "matrix_programme": {"$ref": "#/templates/secretion.matrix_programme/question"}
+   }
+  }
+ }
+}

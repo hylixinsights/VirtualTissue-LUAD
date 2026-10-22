@@ -1,0 +1,48 @@
+{
+  "version": "luad-runtime-0.1.0",
+  "reference_rulebook_version": "1.0.0",
+  "reference_rulebook_sha256": "b27f47db9b31bc89d281d620ad977960942edc85f301c600a292fc8486dda167",
+  "geometry": "fixed Xenium polygons; contact gap <= 1 micrometre",
+  "identity_policy": "Conservative capability intersection; primary annotation is an explicitly named alternative scenario.",
+  "signature_policy": "Depth residual may provide context; raw scores and within-type percentiles never authorize an action. Every signature has limited effective coverage.",
+  "boundary_policy": "Frozen context; boundary and QC-excluded polygons occupy space and never make decisions or supply consumable resources.",
+  "unknown_policy": "Withhold the action and record every unresolved condition.",
+  "failure_policy": "A failed inference gives that cell no new program; already committed clocks advance. Record a mixed-provider episode. No automatic retry.",
+  "handler_rules": ["CD8_COGNATE_CONTACT_DEGRANULATION", "MACROPHAGE_EFFEROCYTOSIS"],
+  "extra_gates": {
+    "CD8_COGNATE_CONTACT_DEGRANULATION": ["runtime.effector_store_available"],
+    "MACROPHAGE_PRESENTS_MHCII_TO_CD4": ["runtime.pmhcii_display_declared", "runtime.presentation_competence_declared"],
+    "APC_CTLA4_COSTIM_WITHDRAWAL": ["runtime.protein_costimulation_declared"],
+    "B_FOLLICULAR_POSITIONING": ["runtime.local_gradient_declared", "runtime.motion_handler_available"],
+    "CAF_TUMOR_INTERFACE_MATRIX": ["runtime.matrix_handler_available"],
+    "TUMOR_VEGFA_SECRETION": ["runtime.field_handler_available"],
+    "PLASMA_CELL_SECRETION": ["runtime.secretion_handler_available"],
+    "TUMOR_CYCLE_PERMISSIVE": ["runtime.cycle_handler_available"],
+    "ENDOTHELIAL_SPROUTING": ["runtime.vascular_handler_available"],
+    "HYPOXIA_ADAPTATION": ["runtime.metabolism_handler_available"],
+    "TREG_SUPPRESSION": ["runtime.treg_handler_available"]
+  },
+  "numerical_assumptions": {
+    "evidence": "SIM: proposed and uncalibrated; no measured event rates",
+    "tick_min": 10,
+    "decision_interval_min": 30,
+    "contact_program_min": 20,
+    "cooldown_min": 60,
+    "pulse_damage_au": 1.0,
+    "checkpoint_damage_factor": 0.25,
+    "death_threshold_au": 2.0,
+    "death_commitment_min": 30,
+    "clearance_min": 40,
+    "clearance_capacity": 2,
+    "effector_pulses": 3,
+    "horizon_min": 360,
+    "max_horizon_min": 1440
+  },
+  "scenarios": {
+    "baseline": {"title": "Conservative baseline", "identity_policy": "intersection", "recognition": null, "effector_competence": null, "clearance_competence": null, "checkpoint": false, "blockade": false},
+    "recognition_off": {"title": "Declared CD8 competence · recognition off", "identity_policy": "primary_annotation", "recognition": false, "effector_competence": true, "clearance_competence": true, "checkpoint": false, "blockade": false},
+    "cognate": {"title": "Declared cognate recognition", "identity_policy": "primary_annotation", "recognition": true, "effector_competence": true, "clearance_competence": true, "checkpoint": false, "blockade": false},
+    "checkpoint": {"title": "Declared inhibitory checkpoint", "identity_policy": "primary_annotation", "recognition": true, "effector_competence": true, "clearance_competence": true, "checkpoint": true, "blockade": false},
+    "blockade": {"title": "Declared checkpoint blockade", "identity_policy": "primary_annotation", "recognition": true, "effector_competence": true, "clearance_competence": true, "checkpoint": true, "blockade": true}
+  }
+}

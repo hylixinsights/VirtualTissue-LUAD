@@ -1,0 +1,1232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/csbl/luad-virtual-tissue/rulebook/rulebook.schema.json",
+  "title": "LUAD virtual tissue rulebook",
+  "type": "object",
+  "required": [
+    "rulebook_version",
+    "sample",
+    "evidence_classes",
+    "measurability_levels",
+    "panel",
+    "annotation",
+    "contact_model",
+    "capabilities",
+    "cell_types",
+    "interactions",
+    "decision_domains",
+    "rules",
+    "perturbations",
+    "engine_constraints",
+    "jev"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "unitInterval": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "evidenceClass": {
+      "type": "string",
+      "enum": [
+        "D-LUAD3",
+        "H-LUAD",
+        "H-NSCLC",
+        "M-LUNG",
+        "X-TISSUE",
+        "METHOD",
+        "SIM"
+      ]
+    },
+    "measurability": {
+      "type": "string",
+      "enum": [
+        "observable",
+        "partially_observable",
+        "assumed_only",
+        "unobservable_by_design"
+      ]
+    },
+    "coverageFlag": {
+      "type": "string",
+      "enum": [
+        "sufficient",
+        "low_coverage",
+        "identity_confounded",
+        "direction_ambiguous"
+      ]
+    },
+    "condition": {
+      "type": "object",
+      "required": [
+        "path",
+        "op",
+        "value",
+        "measurability"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "op": {
+          "type": "string",
+          "enum": [
+            "eq",
+            "neq",
+            "lt",
+            "lte",
+            "gt",
+            "gte",
+            "in",
+            "not_in",
+            "contains",
+            "contains_any",
+            "exists"
+          ]
+        },
+        "value": {},
+        "measurability": {
+          "$ref": "#/$defs/measurability"
+        }
+      }
+    },
+    "effect": {
+      "type": "object",
+      "required": [
+        "event_type",
+        "recipient",
+        "magnitude",
+        "units",
+        "consequence_owner"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "event_type": {
+          "type": "string"
+        },
+        "recipient": {
+          "type": "string"
+        },
+        "magnitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Null until calibrated. A non-null magnitude requires calibration_status != not_calibrated."
+        },
+        "units": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "consequence_owner": {
+          "type": "string",
+          "pattern": "^engine_"
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "required": [
+        "rule_id",
+        "action_id",
+        "decision_domain",
+        "eligible_identities",
+        "capability",
+        "required_conditions",
+        "missing_required_evidence_policy",
+        "data_grounding",
+        "effects",
+        "probability_semantics",
+        "event_rate",
+        "calibration_status",
+        "evidence_scope"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "pattern": "^[A-Z0-9_]+$"
+        },
+        "action_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "decision_domain": {
+          "type": "string"
+        },
+        "eligible_identities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "identity_conflict_policy": {
+          "type": "string",
+          "enum": [
+            "require_all_candidates_in_lineage",
+            "allow_any_candidate_match"
+          ]
+        },
+        "capability": {
+          "type": "string"
+        },
+        "enabled_by_default": {
+          "type": "boolean",
+          "default": true
+        },
+        "disabled_reason": {
+          "type": "string"
+        },
+        "required_conditions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "all": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/condition"
+              }
+            },
+            "any": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/condition"
+              }
+            }
+          }
+        },
+        "missing_required_evidence_policy": {
+          "type": "string",
+          "const": "withhold_action_and_log_unknown"
+        },
+        "conditional_modulators": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_grounding": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/effect"
+          },
+          "minItems": 1
+        },
+        "jev_question_template": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "probability_semantics": {
+          "type": "string",
+          "const": "model_preference_until_event_calibration"
+        },
+        "event_rate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "event_rate_units": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "calibration_status": {
+          "type": "string",
+          "enum": [
+            "not_calibrated",
+            "scenario_parameterised",
+            "calibrated"
+          ]
+        },
+        "evidence_scope": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceClass"
+          },
+          "minItems": 1
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[RTD]\\d+[a-z]?$"
+          }
+        },
+        "transfer_limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "target_conflict_policy": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "calibration_status": {
+                "const": "not_calibrated"
+              }
+            },
+            "required": [
+              "calibration_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "event_rate": {
+                "const": null
+              }
+            },
+            "description": "An uncalibrated rule may not carry an event rate."
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "enabled_by_default": {
+                "const": false
+              }
+            },
+            "required": [
+              "enabled_by_default"
+            ]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "disabled_reason"
+                ]
+              },
+              {
+                "required": [
+                  "notes"
+                ]
+              }
+            ],
+            "description": "A rule that is off by default must say why, here or in its perturbation."
+          }
+        }
+      ]
+    },
+    "perturbation": {
+      "type": "object",
+      "required": [
+        "label",
+        "evidence_scope",
+        "state_variables",
+        "measured_correlates",
+        "reporting_requirement"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "evidence_scope": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidenceClass"
+          },
+          "contains": {
+            "const": "SIM"
+          },
+          "description": "Every perturbation is a simulation construct and must declare SIM."
+        },
+        "state_variables": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "unlocks_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "modulates_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "measured_correlates": {
+          "type": "object",
+          "required": [
+            "available",
+            "not_available"
+          ],
+          "properties": {
+            "available": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "not_available": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reporting_requirement": {
+          "type": "string",
+          "minLength": 20
+        }
+      }
+    }
+  },
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "rulebook_version": {
+      "$ref": "#/$defs/semver"
+    },
+    "manual_version": {
+      "type": "string"
+    },
+    "generated_utc": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "sample": {
+      "type": "object",
+      "required": [
+        "sample_id",
+        "n_cells_annotated",
+        "n_cells_segmented",
+        "n_cells_scored",
+        "patients",
+        "generalisation_warning"
+      ],
+      "properties": {
+        "sample_id": {
+          "type": "string"
+        },
+        "assay": {
+          "type": "string"
+        },
+        "source_object": {
+          "type": "string"
+        },
+        "delivered_object": {
+          "type": "string"
+        },
+        "delivered_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "boundaries": {
+          "type": "string"
+        },
+        "n_cells_annotated": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "n_cells_segmented": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "n_cells_scored": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "section_extent_um": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "patients": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sections": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "replicates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "generalisation_warning": {
+          "type": "string",
+          "minLength": 20
+        }
+      }
+    },
+    "evidence_classes": {
+      "type": "object",
+      "required": [
+        "D-LUAD3",
+        "SIM"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "measurability_levels": {
+      "type": "object",
+      "required": [
+        "observable",
+        "partially_observable",
+        "assumed_only",
+        "unobservable_by_design"
+      ],
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "panel": {
+      "type": "object",
+      "required": [
+        "n_genes",
+        "notable_absent",
+        "absent_meaning"
+      ],
+      "properties": {
+        "n_genes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "expression_layer_for_scores": {
+          "type": "string"
+        },
+        "split_correction": {
+          "type": "object"
+        },
+        "detection_depth": {
+          "type": "object"
+        },
+        "notable_absent": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "absent_meaning": {
+          "type": "string"
+        }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "required": [
+        "primary_column",
+        "secondary_column",
+        "exact_agreement",
+        "policy",
+        "conflict_classes",
+        "populations_with_no_label",
+        "populations_with_no_label_policy"
+      ],
+      "properties": {
+        "primary_column": {
+          "type": "string"
+        },
+        "secondary_column": {
+          "type": "string"
+        },
+        "exact_agreement": {
+          "$ref": "#/$defs/unitInterval"
+        },
+        "n_concordant": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "policy": {
+          "type": "string",
+          "const": "identity_is_a_set"
+        },
+        "policy_detail": {
+          "type": "string"
+        },
+        "conflict_classes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "n",
+              "intersection",
+              "withheld"
+            ],
+            "properties": {
+              "n": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "intersection": {
+                "type": "string"
+              },
+              "withheld": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "populations_with_no_label": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "populations_with_no_label_policy": {
+          "type": "string"
+        }
+      }
+    },
+    "contact_model": {
+      "type": "object",
+      "required": [
+        "definition",
+        "source",
+        "n_contact_pairs_annotated",
+        "mean_contacts_per_cell",
+        "centroid_rule_is_forbidden",
+        "neighbourhood_30um",
+        "occluded_neighbours",
+        "limits"
+      ],
+      "properties": {
+        "definition": {
+          "type": "string",
+          "pattern": "polygon"
+        },
+        "source": {
+          "type": "string"
+        },
+        "n_contact_pairs_annotated": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mean_contacts_per_cell": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sensitivity": {
+          "type": "object"
+        },
+        "tiling": {
+          "type": "object"
+        },
+        "centroid_rule_is_forbidden": {
+          "type": "object",
+          "required": [
+            "f1",
+            "bias",
+            "policy"
+          ],
+          "properties": {
+            "best_threshold_um": {
+              "type": "number"
+            },
+            "precision": {
+              "$ref": "#/$defs/unitInterval"
+            },
+            "recall": {
+              "$ref": "#/$defs/unitInterval"
+            },
+            "f1": {
+              "$ref": "#/$defs/unitInterval"
+            },
+            "bias": {
+              "type": "string"
+            },
+            "policy": {
+              "type": "string"
+            }
+          }
+        },
+        "neighbourhood_30um": {
+          "type": "object",
+          "required": [
+            "role",
+            "policy"
+          ]
+        },
+        "occluded_neighbours": {
+          "type": "object",
+          "required": [
+            "n",
+            "policy"
+          ]
+        },
+        "limits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "label",
+          "measurability",
+          "evidence",
+          "requires"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "measurability": {
+            "$ref": "#/$defs/measurability"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/evidenceClass"
+            },
+            "minItems": 1
+          },
+          "requires": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "missing": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbidden_evidence_substitutions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "weak_correlate": {
+            "type": "object"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "cell_types": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "n",
+          "capabilities"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "n_scored": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "median_polygon_area_um2": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "median_n_genes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "markers_observed": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/$defs/unitInterval"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "interactions": {
+      "type": "object",
+      "required": [
+        "_policy",
+        "_summary"
+      ],
+      "properties": {
+        "_policy": {
+          "type": "string"
+        },
+        "_summary": {
+          "type": "object",
+          "required": [
+            "n_edges",
+            "n_fully_on_panel"
+          ]
+        }
+      },
+      "patternProperties": {
+        "^C\\d{2}$": {
+          "type": "object",
+          "required": [
+            "signal",
+            "on_panel",
+            "missing",
+            "status",
+            "effect"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "signal": {
+              "type": "string"
+            },
+            "on_panel": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "missing": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "complete",
+                "partial",
+                "layer_dependent",
+                "partial_but_undetected",
+                "receptor_absent",
+                "ligand_absent",
+                "absent"
+              ]
+            },
+            "effect": {
+              "type": "string"
+            },
+            "caveat": {
+              "type": "string"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "complete"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "missing": {
+                    "maxItems": 0
+                  }
+                },
+                "description": "An edge is complete only when nothing is missing."
+              }
+            }
+          ]
+        }
+      }
+    },
+    "decision_domains": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "question_type",
+          "mutually_exclusive",
+          "description"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "question_type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "choice",
+              "score",
+              "noul",
+              null
+            ]
+          },
+          "mutually_exclusive": {
+            "type": "boolean"
+          },
+          "engine_owned": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule"
+      },
+      "minItems": 1
+    },
+    "perturbations": {
+      "type": "object",
+      "required": [
+        "_policy"
+      ],
+      "properties": {
+        "_policy": {
+          "type": "string"
+        }
+      },
+      "patternProperties": {
+        "^(?!_)[a-z_]+$": {
+          "$ref": "#/$defs/perturbation"
+        }
+      }
+    },
+    "assumed_competence_profiles": {
+      "type": "object",
+      "required": [
+        "none"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "description",
+          "assumptions"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "cell_types",
+                "component",
+                "assumed",
+                "basis",
+                "measured"
+              ],
+              "properties": {
+                "cell_types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "component": {
+                  "type": "string"
+                },
+                "assumed": {
+                  "type": "string"
+                },
+                "basis": {
+                  "type": "string"
+                },
+                "measured": {
+                  "type": "boolean",
+                  "const": false
+                }
+              }
+            }
+          },
+          "propagation": {
+            "type": "string"
+          },
+          "must_not": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "engine_constraints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "constraint"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^H\\d{2}$"
+          },
+          "constraint": {
+            "type": "string"
+          },
+          "basis": {
+            "type": "string"
+          },
+          "supersedes": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "superseded"
+            ]
+          }
+        }
+      }
+    },
+    "jev": {
+      "type": "object",
+      "required": [
+        "endpoint",
+        "model",
+        "primitives",
+        "state_projection",
+        "call_policy",
+        "audit_record"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "model_class": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "method": {
+          "type": "string",
+          "const": "POST"
+        },
+        "auth": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "model_pinning": {
+          "type": "string"
+        },
+        "documented_limits": {
+          "type": "object"
+        },
+        "primitives": {
+          "type": "object",
+          "required": [
+            "choice",
+            "score",
+            "noul"
+          ],
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "request",
+              "response",
+              "semantics"
+            ],
+            "properties": {
+              "request": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "criteria_shape": {
+                "type": "string"
+              },
+              "response": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "semantics": {
+                "type": "string"
+              },
+              "authoring_rule": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "state_projection": {
+          "type": "object",
+          "required": [
+            "policy",
+            "target_tokens",
+            "hard_cap_tokens",
+            "always_include",
+            "never_include"
+          ],
+          "properties": {
+            "policy": {
+              "type": "string"
+            },
+            "target_tokens": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "hard_cap_tokens": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 64000
+            },
+            "always_include": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "include_when_relevant": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "never_include": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "excluded_actions_rationale": {
+              "type": "string"
+            }
+          }
+        },
+        "call_policy": {
+          "type": "object",
+          "required": [
+            "when_to_call",
+            "failure_policy",
+            "validation"
+          ]
+        },
+        "audit_record": {
+          "type": "object",
+          "required": [
+            "required_fields",
+            "separability"
+          ],
+          "properties": {
+            "required_fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "separability": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "validation_requirements": {
+      "type": "object"
+    },
+    "open_parameters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "parameter",
+          "status",
+          "needed"
+        ],
+        "properties": {
+          "parameter": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "needed": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

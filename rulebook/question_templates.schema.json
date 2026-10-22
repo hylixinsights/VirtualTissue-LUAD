@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/csbl/luad-virtual-tissue/rulebook/question_templates.schema.json",
+  "title": "Jev question templates",
+  "description": "Validates the shape of every questions block against the documented TypeSafe System One primitives: choice (criteria = object of option -> description, <=255 options), score (criteria = ordered array of 2-10 level descriptions), noul (optional criteria with true/false).",
+  "type": "object",
+  "required": ["templates_version", "rulebook_version", "authoring_rules", "templates"],
+  "additionalProperties": false,
+
+  "$defs": {
+    "semver": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "criterionText": {
+      "oneOf": [
+        {"type": "string", "minLength": 1},
+        {"type": "null"},
+        {"type": "object"},
+        {"type": "array"}
+      ]
+    },
+    "choiceQuestion": {
+      "type": "object",
+      "required": ["type", "instructions", "criteria"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"const": "choice"},
+        "instructions": {"type": "string", "minLength": 40},
+        "criteria": {
+          "type": "object",
+          "minProperties": 2,
+          "maxProperties": 255,
+          "propertyNames": {"pattern": "^[a-z0-9_]+$"},
+          "additionalProperties": {"$ref": "#/$defs/criterionText"}
+        }
+      }
+    },
+    "scoreQuestion": {
+      "type": "object",
+      "required": ["type", "instructions", "criteria"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"const": "score"},
+        "instructions": {"type": "string", "minLength": 40},
+        "criteria": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 10,
+          "items": {"$ref": "#/$defs/criterionText"}
+        }
+      }
+    },
+    "noulQuestion": {
+      "type": "object",
+      "required": ["type", "instructions"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"const": "noul"},
+        "instructions": {"type": "string", "minLength": 40},
+        "criteria": {
+          "type": "object",
+          "required": ["true", "false"],
+          "additionalProperties": false,
+          "properties": {
+            "true": {"type": "string"},
+            "false": {"type": "string"}
+          }
+        }
+      }
+    }
+  },
+
+  "properties": {
+    "$schema": {"type": "string"},
+    "templates_version": {"$ref": "#/$defs/semver"},
+    "rulebook_version": {"$ref": "#/$defs/semver"},
+    "summary": {"type": "string"},
+    "authoring_rules": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "placeholders": {"type": "object", "additionalProperties": {"type": "string"}},
+    "worked_multi_question_request": {"type": "object"},
+
+    "templates": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[a-z_]+\\.[a-z0-9_]+$"},
+      "additionalProperties": {
+        "type": "object",
+        "required": ["decision_domain", "rule_ids", "question_key", "question"],
+        "additionalProperties": false,
+        "properties": {
+          "decision_domain": {"type": "string"},
+          "rule_ids": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z0-9_]+$"}, "minItems": 1},
+          "question_key": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "question": {
+            "oneOf": [
+              {"$ref": "#/$defs/choiceQuestion"},
+              {"$ref": "#/$defs/scoreQuestion"},
+              {"$ref": "#/$defs/noulQuestion"}
+            ]
+          }
+        }
+      }
+    }
+  }
+}

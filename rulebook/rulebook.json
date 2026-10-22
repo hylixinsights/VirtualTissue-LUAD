@@ -1,0 +1,3016 @@
+{
+ "$schema": "./rulebook.schema.json",
+ "rulebook_version": "1.0.0",
+ "manual_version": "1.0",
+ "generated_utc": "2026-09-22T00:00:00Z",
+ "title": "LUAD virtual tissue rulebook",
+ "summary": "Machine-readable form of MANUAL.md. Declares what each cell type may do, which conditions gate each action, which of those conditions LUAD3 actually measures, and how a decision is posed to a TypeSafe Jev System One model. This file is read by the simulation engine. It is never sent to Jev: the engine projects a small per-decision `state` from it (see jev.state_projection).",
+ "sample": {
+  "sample_id": "LUAD3",
+  "assay": "10x Xenium, 302-gene panel",
+  "source_object": "Xenium_LUAD_No3_annotated.h5ad",
+  "delivered_object": "LUAD3_TLS_GO20_UCell.h5ad",
+  "delivered_sha256": "341e6e591e9dd6cd3f617919ac0e0683ebc5632f7879e25d6a9756d611795752",
+  "boundaries": "cell_boundaries.csv",
+  "n_cells_annotated": 133464,
+  "n_cells_segmented": 150055,
+  "n_cells_scored": 44134,
+  "section_extent_um": [
+   7907.6,
+   6754.3
+  ],
+  "patients": 1,
+  "sections": 1,
+  "replicates": 0,
+  "generalisation_warning": "n = 1. Every D-LUAD3 value describes this section. None is an estimate of LUAD as a disease."
+ },
+ "evidence_classes": {
+  "D-LUAD3": "Measured in this specimen. Strongest evidence for initialising the simulation, weakest for any general biological claim.",
+  "H-LUAD": "Human lung adenocarcinoma literature.",
+  "H-NSCLC": "Human NSCLC literature; transfer conditional on histology.",
+  "M-LUNG": "Experimental lung-tumour model.",
+  "X-TISSUE": "Another tumour, tissue or experimental setting; mechanism transferred.",
+  "METHOD": "Methods paper or official technical documentation.",
+  "SIM": "Explicit simulation design choice. Must never be presented as an observation."
+ },
+ "measurability_levels": {
+  "observable": "All required components are on the panel and detectable in the relevant cell type.",
+  "partially_observable": "Some required components are on the panel.",
+  "assumed_only": "No required component is on the panel. Usable only inside a named assumed_competence_profile.",
+  "unobservable_by_design": "Requires protein, V(D)J, flux, or time. No Xenium re-analysis can supply it."
+ },
+ "panel": {
+  "n_genes": 302,
+  "expression_layer_for_scores": "purified_raw",
+  "split_correction": {
+   "counts_retained": 0.792,
+   "nonzero_entries_retained": 0.94,
+   "consequence": "SPLIT rescales magnitudes but does not clear spillover-positive cells; UCell ranks within the cell, so spillover still contributes."
+  },
+  "detection_depth": {
+   "median_n_genes_by_counts": 33,
+   "median_nonzero_purified_raw": 31,
+   "median_nonzero_purified_raw_scored_cells": 29,
+   "note": "Three correct values circulate in the delivery. The third is the covariate that governs score interpretation."
+  },
+  "notable_absent": [
+   "IFNG",
+   "IFNGR1",
+   "IFNGR2",
+   "IL12A",
+   "IL12B",
+   "IL10",
+   "IL10RA",
+   "IL10RB",
+   "CSF1",
+   "CSF1R",
+   "TGFBR1",
+   "TGFBR2",
+   "TNFRSF1A",
+   "TNFRSF1B",
+   "IL1R1",
+   "IL6R",
+   "IL6ST",
+   "CXCR3",
+   "CXCL10",
+   "CCL2",
+   "CCR2",
+   "CXCL12",
+   "CXCR4",
+   "CD28",
+   "CD40",
+   "IL21",
+   "IL21R",
+   "IL2",
+   "IL15",
+   "IL7",
+   "IL7R",
+   "FAS",
+   "FASLG",
+   "KLRK1",
+   "MICA",
+   "MICB",
+   "HLA-E",
+   "B2M",
+   "TOX",
+   "HAVCR2",
+   "AICDA",
+   "BCL6",
+   "CR2",
+   "FCER2",
+   "ENTPD1",
+   "NT5E",
+   "LTA",
+   "LTB",
+   "LTBR"
+  ],
+  "absent_meaning": "not_assayed. Never 'not_detected', and never 'functionally absent'.",
+  "gene_evidence_layer": "purified_raw",
+  "gene_evidence_layer_policy": "Gene evidence is read from purified_raw, the layer UCell ranked, so that a rule and a signature never disagree about whether a transcript exists. Seven genes are present in raw_counts and effectively absent from purified_raw; a rule may read raw_counts for one of them only by naming the gene and the layer explicitly in its conditions.",
+  "layer_sensitive_genes": {
+   "_note": "SPLIT removes >99% of the detections of these genes. 292 of 302 genes are unaffected (detection ratio > 0.95). Three of the seven are MHC genes, which is why the antigen-presentation axis is weaker than raw_counts suggests.",
+   "HLA-A": {
+    "det_raw_counts": 0.6279,
+    "det_purified_raw": 0.0038,
+    "counts_kept": 0.003
+   },
+   "HLA-DPB1": {
+    "det_raw_counts": 0.5732,
+    "det_purified_raw": 0.0033,
+    "counts_kept": 0.002
+   },
+   "PTP4A1": {
+    "det_raw_counts": 0.4785,
+    "det_purified_raw": 0.0019,
+    "counts_kept": 0.001
+   },
+   "HLA-DQB2": {
+    "det_raw_counts": 0.1729,
+    "det_purified_raw": 0.0006,
+    "counts_kept": 0.003
+   },
+   "AKR1C1": {
+    "det_raw_counts": 0.1403,
+    "det_purified_raw": 0.0008,
+    "counts_kept": 0.005
+   },
+   "KRT81": {
+    "det_raw_counts": 0.0908,
+    "det_purified_raw": 0.0004,
+    "counts_kept": 0.005
+   },
+   "DAPL1": {
+    "det_raw_counts": 0.0594,
+    "det_purified_raw": 0.0005,
+    "counts_kept": 0.009
+   }
+  },
+  "signatures_affected_by_layer": {
+   "Antigen processing and presentation": {
+    "n_on_panel": 16,
+    "n_deleted": 3,
+    "effective": 13
+   },
+   "Type II interferon production": {
+    "n_on_panel": 12,
+    "n_deleted": 2,
+    "effective": 10
+   },
+   "T cell mediated cytotoxicity": {
+    "n_on_panel": 8,
+    "n_deleted": 1,
+    "effective": 7
+   },
+   "Leukocyte cell cell adhesion": {
+    "n_on_panel": 53,
+    "n_deleted": 4,
+    "effective": 49
+   },
+   "T cell activation": {
+    "n_on_panel": 58,
+    "n_deleted": 4,
+    "effective": 54
+   },
+   "Apoptotic signaling": {
+    "n_on_panel": 29,
+    "n_deleted": 1,
+    "effective": 28
+   },
+   "_note": "Nominal panel coverage overstates these six signatures. The other fourteen are unaffected."
+  }
+ },
+ "annotation": {
+  "primary_column": "cell_type_fine",
+  "secondary_column": "first_type",
+  "exact_agreement": 0.3485,
+  "policy": "identity_is_a_set",
+  "policy_detail": "Neither column is a superset of the other. cell_type_fine resolves plasma cells, CAF and proliferating tumour; first_type resolves DC, myeloid, mast/NK and Undefined. A cell carries both labels. Rules act on the intersection of the candidate repertoires unless an identity_scenario is declared.",
+  "conflict_classes": {
+   "B_vs_plasma": {
+    "n": 7722,
+    "intersection": "lymphoid maintenance, migration",
+    "withheld": [
+     "antigen_presentation_mhcii",
+     "secrete_immunoglobulin"
+    ]
+   },
+   "B_vs_CD8": {
+    "n": 4072,
+    "intersection": "lymphoid maintenance, migration",
+    "withheld": [
+     "degranulate",
+     "secrete_immunoglobulin",
+     "antigen_presentation_mhcii"
+    ]
+   },
+   "CD4_vs_CD8": {
+    "n": 5997,
+    "intersection": "T maintenance, migration",
+    "withheld": [
+     "degranulate",
+     "provide_cd40l_help"
+    ]
+   },
+   "stromal_vs_CD4": {
+    "n": 8487,
+    "intersection": "maintenance",
+    "withheld": [
+     "deposit_matrix",
+     "provide_cd40l_help"
+    ]
+   },
+   "tumor_vs_fibroblast": {
+    "n": 5121,
+    "intersection": "maintenance, matrix response",
+    "withheld": [
+     "proliferate",
+     "malignant_program"
+    ]
+   },
+   "endothelial_vs_CD8": {
+    "n": 3876,
+    "intersection": "maintenance",
+    "withheld": [
+     "degranulate",
+     "barrier_function"
+    ]
+   },
+   "DC_vs_various": {
+    "n": 2069,
+    "intersection": "antigen uptake",
+    "withheld": [
+     "antigen_presentation_mhcii",
+     "prime_naive_T"
+    ]
+   }
+  },
+  "populations_with_no_label": [
+   "AT1",
+   "AT2",
+   "club",
+   "ciliated",
+   "basal",
+   "NK",
+   "mast_cell",
+   "neutrophil",
+   "pDC",
+   "gamma_delta_T",
+   "MAIT",
+   "ILC",
+   "pericyte",
+   "lymphatic_endothelium",
+   "Treg"
+  ],
+  "populations_with_no_label_policy": "Instantiate as not_annotated with the generic maintenance/damage repertoire only. Absence of a label is not absence from the tissue.",
+  "lineage_agreement": 0.6258,
+  "n_concordant_exact": 46513,
+  "n_concordant_lineage": 83525,
+  "vocabulary_mismatch": {
+   "only_in_cell_type_fine": [
+    "CAF",
+    "Fibroblast",
+    "Macrophage_SPP1",
+    "Plasma_cell",
+    "T_CD8_cytotoxic",
+    "Tumor_proliferating"
+   ],
+   "only_in_first_type": [
+    "DC",
+    "Mast_NK",
+    "Myeloid",
+    "Stromal",
+    "T_CD8",
+    "Undefined"
+   ],
+   "consequence": "Exact-string agreement of 34.85% is not a disagreement rate. A plasma cell CANNOT be concordant, because first_type has no Plasma_cell category at all; the same holds for CAF, Fibroblast and Tumor_proliferating. Compare at lineage level first, and reserve 'conflict' for cells whose lineages actually differ."
+  },
+  "lineage_map": {
+   "cell_type_fine": {
+    "B_cell": "B_lineage",
+    "Plasma_cell": "B_lineage",
+    "T_CD4": "T",
+    "T_CD8_cytotoxic": "T",
+    "Macrophage_SPP1": "myeloid",
+    "CAF": "stromal",
+    "Fibroblast": "stromal",
+    "Endothelial": "endothelial",
+    "Tumor": "tumor",
+    "Tumor_proliferating": "tumor"
+   },
+   "first_type": {
+    "B_cell": "B_lineage",
+    "T_CD4": "T",
+    "T_CD8": "T",
+    "DC": "myeloid",
+    "Myeloid": "myeloid",
+    "Stromal": "stromal",
+    "Endothelial": "endothelial",
+    "Tumor": "tumor",
+    "Mast_NK": "other",
+    "Undefined": "other"
+   }
+  },
+  "agreement_levels": {
+   "concordant_exact": "both columns give the same label",
+   "concordant_lineage": "labels differ but map to the same lineage; usually a vocabulary granularity difference, not a disagreement",
+   "conflict": "the two columns assign different lineages"
+  },
+  "largest_lineage_conflicts": {
+   "first_type stromal -> cell_type_fine T": 10420,
+   "first_type B_lineage -> cell_type_fine T": 5705,
+   "first_type endothelial -> cell_type_fine T": 5333,
+   "first_type tumor -> cell_type_fine stromal": 5121,
+   "first_type stromal -> cell_type_fine B_lineage": 2509
+  },
+  "identity_conflict_policies": {
+   "require_all_candidates_in_lineage": "Every candidate label must map to a lineage the rule accepts. This is engine constraint H15 applied strictly, and it is the default for any rule whose action is irreversible or damaging.",
+   "allow_any_candidate_match": "One matching candidate suffices. The state still carries identity_agreement, so the model can weigh the uncertainty. Use only for reversible, non-damaging actions."
+  }
+ },
+ "contact_model": {
+  "definition": "polygon boundary gap <= 1.0 um",
+  "source": "cell_boundaries.csv, 150055 polygons, <=13 vertices each, obsm['spatial'] frame",
+  "n_contact_pairs_annotated": 377270,
+  "mean_contacts_per_cell": 6.11,
+  "sensitivity": {
+   "gap_0.25um": 349703,
+   "gap_0.5um": 365177,
+   "gap_1.0um": 377270,
+   "gap_2.0um": 406603,
+   "gap_5.0um": 527090
+  },
+  "tiling": {
+   "contacted_perimeter_fraction": "~1.0",
+   "consequence": "The tissue is a near-complete tiling. There is no free space: a cell cannot move without displacing another, and a free-membrane budget is not a meaningful variable."
+  },
+  "centroid_rule_is_forbidden": {
+   "best_threshold_um": 15,
+   "precision": 0.636,
+   "recall": 0.682,
+   "f1": 0.658,
+   "bias": "size-dependent and bidirectional: under-counts contacts of large cells (CAF median 227 um2) by ~2x, over-counts among small dense cells (B_cell 43.4 um2) by up to 1.8x",
+   "policy": "A centroid threshold may not be used as a contact test."
+  },
+  "neighbourhood_30um": {
+   "role": "soluble mediator exposure only",
+   "precision_as_contact_test": 0.223,
+   "policy": "Separate field from contacts. Never interchangeable."
+  },
+  "occluded_neighbours": {
+   "n": 16591,
+   "median_area_um2": 74.7,
+   "share_of_all_contacts": 0.075,
+   "share_of_cells_with_at_least_one": 0.282,
+   "by_focal_type_pct": {
+    "Endothelial": 12.9,
+    "Fibroblast": 12.8,
+    "Plasma_cell": 12.1,
+    "Macrophage_SPP1": 11.7,
+    "T_CD8_cytotoxic": 10.9,
+    "B_cell": 4.5,
+    "T_CD4": 4.1,
+    "CAF": 2.4,
+    "Tumor": 1.4,
+    "Tumor_proliferating": 0.8
+   },
+   "policy": "Instantiate as occluded_neighbour agents: they occupy space, block movement and can receive imposed damage, but have no identity, state or repertoire. Deleting them makes the tissue porous in a biased way."
+  },
+  "limits": [
+   "2-D section: contacts out of the imaging plane are invisible.",
+   "Contact area in 3-D is unknown; interface lengths are 2-D perimeters.",
+   "Contact is adjacency, not synapse formation, and never implies recognition."
+  ]
+ },
+ "capabilities": {
+  "maintain_homeostasis": {
+   "label": "Maintain homeostasis",
+   "measurability": "assumed_only",
+   "evidence": [
+    "SIM"
+   ],
+   "requires": []
+  },
+  "migrate": {
+   "label": "Migrate by displacing a contact partner",
+   "measurability": "partially_observable",
+   "evidence": [
+    "D-LUAD3",
+    "H-NSCLC"
+   ],
+   "requires": [
+    "contact_graph"
+   ],
+   "note": "Geometry is measured; migration rate is uncalibrated."
+  },
+  "degranulate": {
+   "label": "Deliver a cytotoxic pulse to a contacted target",
+   "measurability": "partially_observable",
+   "evidence": [
+    "H-NSCLC",
+    "X-TISSUE"
+   ],
+   "requires": [
+    "contact",
+    "cognate_recognition",
+    "effector_competence"
+   ],
+   "forbidden_evidence_substitutions": [
+    "GOBP_T_CELL_MEDIATED_CYTOTOXICITY as effector competence: 8 of 60 genes on panel, 6 of them APC- or target-side (CD1C, CD1E, FCGR2B, HLA-A, NECTIN2, PVR); median 0.124 in CD8 vs 0.076 in Tumor",
+    "GZMB detection as competence: 3.1% of CD8 cells",
+    "PRF1 detection as competence: 7.4% of CD8 cells and 16.1% of Tumor cells"
+   ]
+  },
+  "antigen_presentation_mhci": {
+   "label": "Present peptide on MHC-I",
+   "measurability": "assumed_only",
+   "evidence": [
+    "H-NSCLC"
+   ],
+   "requires": [],
+   "missing": [
+    "B2M",
+    "HLA-A is layer-sensitive: 62.8% in raw_counts, 0.38% in purified_raw"
+   ],
+   "note": "No MHC-I component survives in the scoring layer. The axis exists only inside a declared assumed_competence_profile."
+  },
+  "antigen_presentation_mhcii": {
+   "label": "Present peptide on MHC-II",
+   "measurability": "partially_observable",
+   "evidence": [
+    "H-NSCLC",
+    "D-LUAD3"
+   ],
+   "requires": [
+    "CD74"
+   ],
+   "note": "CD74 (95.9% in macrophages, layer-stable) is the invariant chain, a marker of the MHC-II pathway rather than MHC-II itself. Peptide identity remains unknown. This is weaker evidence than v0 of this rulebook claimed.",
+   "missing": [
+    "HLA-DPB1 and HLA-DQB2 are layer-sensitive: 57.3% and 17.3% in raw_counts, 0.33% and 0.06% in purified_raw"
+   ]
+  },
+  "costimulate": {
+   "label": "Provide CD80/CD86 costimulation",
+   "measurability": "partially_observable",
+   "evidence": [
+    "X-TISSUE"
+   ],
+   "requires": [
+    "CD80|CD86"
+   ],
+   "missing": [
+    "CD28"
+   ]
+  },
+  "regulate_costimulation": {
+   "label": "Reduce the costimulation available at a contacted interface",
+   "measurability": "assumed_only",
+   "evidence": [
+    "SIM",
+    "X-TISSUE"
+   ],
+   "requires": [
+    "identity_scenario"
+   ],
+   "note": "Inert in LUAD3: no Treg label exists and FOXP3 is detected in 4.1% of CD4 cells, which cannot call Tregs per cell. The capability exists so a declared Treg scenario has somewhere to attach."
+  },
+  "receive_checkpoint_inhibition": {
+   "label": "Receive PD-1 / CTLA-4 inhibitory input",
+   "measurability": "assumed_only",
+   "evidence": [
+    "SIM"
+   ],
+   "requires": [
+    "PDCD1|CTLA4"
+   ],
+   "note": "PDCD1 is detected in 0.6% of CD8 cells and 0.3% of all cells. At single-cell level this axis is unmeasured; it exists only inside the checkpoint_blockade perturbation."
+  },
+  "provide_cd40l_help": {
+   "label": "Provide CD40L help",
+   "measurability": "partially_observable",
+   "evidence": [
+    "H-NSCLC"
+   ],
+   "requires": [
+    "CD40LG"
+   ],
+   "missing": [
+    "CD40"
+   ]
+  },
+  "secrete_immunoglobulin": {
+   "label": "Secrete clone-defined immunoglobulin",
+   "measurability": "partially_observable",
+   "evidence": [
+    "H-NSCLC"
+   ],
+   "requires": [
+    "MZB1|XBP1"
+   ],
+   "note": "Antibody quantity establishes no antitumour activity without antigen, affinity and an effector mechanism. No clonal state exists."
+  },
+  "phagocytose": {
+   "label": "Phagocytose or efferocytose",
+   "measurability": "partially_observable",
+   "evidence": [
+    "X-TISSUE"
+   ],
+   "requires": [
+    "apoptotic_target_created_by_engine"
+   ],
+   "forbidden_evidence_substitutions": [
+    "GOBP_PHAGOCYTOSIS as engulfment activity: its panel genes (MARCO, MSR1, ITGAM, ITGAX, PECAM1, PTPRC) are myeloid identity"
+   ]
+  },
+  "deposit_matrix": {
+   "label": "Deposit or remodel extracellular matrix",
+   "measurability": "partially_observable",
+   "evidence": [
+    "H-NSCLC"
+   ],
+   "requires": [
+    "COL1A1|FAP|POSTN|TNC"
+   ],
+   "note": "No matrix-architecture channel was measured. Density and orientation are SIM."
+  },
+  "secrete_vegfa": {
+   "label": "Secrete VEGFA",
+   "measurability": "observable",
+   "evidence": [
+    "D-LUAD3",
+    "H-NSCLC"
+   ],
+   "requires": [
+    "VEGFA"
+   ],
+   "note": "VEGFA detected in 52.0% of tumour cells; KDR in 23.9% of endothelial cells. The only near-complete vascular edge."
+  },
+  "angiogenic_response": {
+   "label": "Respond to VEGFA via KDR",
+   "measurability": "partially_observable",
+   "evidence": [
+    "H-NSCLC"
+   ],
+   "requires": [
+    "KDR"
+   ],
+   "missing": [
+    "FLT1"
+   ]
+  },
+  "proliferate": {
+   "label": "Progress the cell cycle and divide",
+   "measurability": "partially_observable",
+   "evidence": [
+    "D-LUAD3"
+   ],
+   "requires": [
+    "cycle_state_machine"
+   ],
+   "forbidden_evidence_substitutions": [
+    "GOBP_MITOTIC_CELL_CYCLE as proliferative state: 18 of 959 genes on panel (1.9% coverage), and Tumor_proliferating scores LOWER than Tumor (0.207 vs 0.223)"
+   ],
+   "note": "Proliferation is a timed engine state machine seeded with low confidence, never score-driven."
+  },
+  "adapt_to_hypoxia": {
+   "label": "Mount a hypoxia-compatible transcriptional response",
+   "measurability": "assumed_only",
+   "evidence": [
+    "SIM",
+    "X-TISSUE"
+   ],
+   "requires": [
+    "oxygen_field"
+   ],
+   "missing": [
+    "CA9",
+    "EGLN3",
+    "BNIP3",
+    "HIF1A"
+   ],
+   "weak_correlate": {
+    "signature": "GOBP_RESPONSE_TO_OXYGEN_LEVELS",
+    "coverage": 0.0486,
+    "flag": "low_coverage"
+   }
+  },
+  "barrier_function": {
+   "label": "Maintain vascular barrier and regulate adhesion",
+   "measurability": "partially_observable",
+   "evidence": [
+    "H-NSCLC"
+   ],
+   "requires": [
+    "PECAM1"
+   ],
+   "note": "No HEV evidence: PNAd/MECA-79 is a glycan and unmeasurable; SELP detected in 6.1% of endothelial cells."
+  },
+  "die": {
+   "label": "Enter a death state",
+   "measurability": "unobservable_by_design",
+   "evidence": [
+    "SIM"
+   ],
+   "requires": [
+    "engine_death_module"
+   ],
+   "note": "Nothing in the object flags dying cells. Dead cells and debris are under-segmented by construction, so recovered frequencies cannot estimate death rates."
+  }
+ },
+ "cell_types": {
+  "Tumor": {
+   "n": 22987,
+   "n_scored": 1784,
+   "median_polygon_area_um2": 142.4,
+   "median_n_genes": 57,
+   "capabilities": [
+    "maintain_homeostasis",
+    "proliferate",
+    "antigen_presentation_mhci",
+    "secrete_vegfa",
+    "deposit_matrix",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "NAPSA": 0.964,
+    "SFTPB": 0.908,
+    "EGFR": 0.8,
+    "MET": 0.802,
+    "CDH1": 0.754,
+    "VEGFA": 0.52
+   },
+   "notes": [
+    "Genotype (EGFR/KRAS/STK11/KEAP1) is unknown and must stay unknown outside a declared perturbation.",
+    "98.5% of tumour cells touch another tumour cell; nests are closed."
+   ]
+  },
+  "Tumor_proliferating": {
+   "n": 4158,
+   "n_scored": 300,
+   "median_polygon_area_um2": 153.2,
+   "median_n_genes": 50,
+   "capabilities": [
+    "maintain_homeostasis",
+    "proliferate",
+    "antigen_presentation_mhci",
+    "secrete_vegfa",
+    "deposit_matrix",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "UBE2C": 0.146,
+    "MKI67": 0.033
+   },
+   "notes": [
+    "The label rests on UBE2C (14.6% vs 4.2% in Tumor) and MKI67 (3.3% vs 1.4%), both sparse.",
+    "It does NOT have a higher mitotic-cell-cycle UCell score than Tumor."
+   ]
+  },
+  "CAF": {
+   "n": 6592,
+   "n_scored": 789,
+   "median_polygon_area_um2": 227.0,
+   "median_n_genes": 45,
+   "capabilities": [
+    "maintain_homeostasis",
+    "migrate",
+    "deposit_matrix",
+    "secrete_vegfa",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "COL1A1": 0.901,
+    "ACTA2": 0.88,
+    "PDGFRA": 0.578,
+    "FAP": 0.284
+   },
+   "notes": [
+    "The tumour-contacting population: 59.8% touch a tumour cell, median polygon gap 0.1 um.",
+    "Largest cells in the section; the centroid rule under-counted their contacts by ~2x."
+   ]
+  },
+  "Fibroblast": {
+   "n": 16428,
+   "n_scored": 2287,
+   "median_polygon_area_um2": 153.5,
+   "median_n_genes": 23,
+   "capabilities": [
+    "maintain_homeostasis",
+    "migrate",
+    "deposit_matrix",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "COL1A1": 0.543,
+    "PDGFRA": 0.334
+   },
+   "notes": [
+    "Lowest detection depth in the section; its low scores are partly a depth artefact, not quiescence."
+   ]
+  },
+  "B_cell": {
+   "n": 17990,
+   "n_scored": 16446,
+   "median_polygon_area_um2": 43.4,
+   "median_n_genes": 32,
+   "capabilities": [
+    "maintain_homeostasis",
+    "migrate",
+    "antigen_presentation_mhcii",
+    "costimulate",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "BANK1": 0.884,
+    "PTPRC": 0.787,
+    "CD19": 0.513,
+    "CXCR5": 0.25,
+    "CXCL13": 0.506
+   },
+   "notes": [
+    "Germinal-centre module is DISABLED: AICDA, BCL6, CR2 and FCER2 are all not_assayed and no clonal state exists.",
+    "CXCL13 in 50.6% of B cells is the inverse of the canonical Tfh/stromal pattern and must be verified before use.",
+    "91.6% touch another B cell; 67.1% of a B cell's interface is B-B."
+   ]
+  },
+  "Plasma_cell": {
+   "n": 12907,
+   "n_scored": 3816,
+   "median_polygon_area_um2": 107.7,
+   "median_n_genes": 26,
+   "capabilities": [
+    "maintain_homeostasis",
+    "secrete_immunoglobulin",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "XBP1": 0.97,
+    "MZB1": 0.534,
+    "TNFRSF17": 0.203
+   },
+   "notes": [
+    "Absent from first_type entirely.",
+    "BAFF/APRIL survival edges are unusable: TNFSF13 and TNFSF13B are not_assayed.",
+    "High ER-stress score is the secretory UPR, not terminal damage."
+   ]
+  },
+  "T_CD8_cytotoxic": {
+   "n": 20082,
+   "n_scored": 8899,
+   "median_polygon_area_um2": 60.6,
+   "median_n_genes": 26,
+   "capabilities": [
+    "maintain_homeostasis",
+    "migrate",
+    "degranulate",
+    "receive_checkpoint_inhibition",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "PTPRC": 0.83,
+    "CD3E": 0.549,
+    "CD8A": 0.219,
+    "TIGIT": 0.201,
+    "LAG3": 0.037,
+    "PDCD1": 0.006,
+    "GZMB": 0.031,
+    "PRF1": 0.074
+   },
+   "notes": [
+    "Exhaustion axis unavailable: TOX and HAVCR2 are not_assayed.",
+    "1.38% touch a tumour cell section-wide; the degranulation rule is ineligible for ~99% of them at initialisation."
+   ]
+  },
+  "T_CD4": {
+   "n": 13487,
+   "n_scored": 4106,
+   "median_polygon_area_um2": 138.6,
+   "median_n_genes": 42,
+   "capabilities": [
+    "maintain_homeostasis",
+    "migrate",
+    "provide_cd40l_help",
+    "adapt_to_hypoxia",
+    "regulate_costimulation",
+    "die"
+   ],
+   "markers_observed": {
+    "CD4": 0.348,
+    "CD3E": 0.268,
+    "CD40LG": 0.066,
+    "FOXP3": 0.041
+   },
+   "notes": [
+    "No Treg label exists and FOXP3 is detected in 4.1% of CD4 cells. Treg-specific rules are DISABLED; a Treg scenario may be declared but not inferred."
+   ]
+  },
+  "Macrophage_SPP1": {
+   "n": 7651,
+   "n_scored": 2842,
+   "median_polygon_area_um2": 96.2,
+   "median_n_genes": 24,
+   "capabilities": [
+    "maintain_homeostasis",
+    "migrate",
+    "phagocytose",
+    "antigen_presentation_mhcii",
+    "costimulate",
+    "secrete_vegfa",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "CD68": 0.482,
+    "MSR1": 0.428,
+    "CD163": 0.424,
+    "ITGAX": 0.347,
+    "C1QC": 0.226,
+    "SPP1": 0.135
+   },
+   "notes": [
+    "The connector population: 48.3% touch a CD8 T cell, 40.2% a CD4 T cell, 25.1% a B cell, 13.8% a tumour cell.",
+    "The antigen-presentation circuits it supports are the most spatially eligible in this section."
+   ]
+  },
+  "Endothelial": {
+   "n": 11182,
+   "n_scored": 2865,
+   "median_polygon_area_um2": 143.1,
+   "median_n_genes": 28,
+   "capabilities": [
+    "maintain_homeostasis",
+    "barrier_function",
+    "angiogenic_response",
+    "adapt_to_hypoxia",
+    "die"
+   ],
+   "markers_observed": {
+    "PECAM1": 0.656,
+    "PLVAP": 0.43,
+    "KDR": 0.239,
+    "PROX1": 0.1,
+    "SELP": 0.061
+   },
+   "notes": [
+    "Lymphatic subtype is not separated. No HEV evidence.",
+    "bv_HH_60 / bv_HH_100 / bv_peri_HH in the object are B-cell LISA flags, NOT a vessel mask."
+   ]
+  },
+  "not_annotated": {
+   "n": 0,
+   "capabilities": [
+    "maintain_homeostasis",
+    "die"
+   ],
+   "notes": [
+    "For populations the annotation does not resolve. Generic maintenance and damage handling only."
+   ]
+  },
+  "occluded_neighbour": {
+   "n": 16591,
+   "capabilities": [],
+   "notes": [
+    "Segmented but QC-dropped. Occupies space, blocks movement, can receive imposed damage. No identity, no state, no repertoire, no Jev call."
+   ]
+  }
+ },
+ "interactions": {
+  "_policy": "A rule whose required components include a not_assayed gene resolves to unknown, not false, and is withheld unless an assumed_competence_profile is active.",
+  "_summary": {
+   "n_edges": 34,
+   "n_fully_on_panel": 2,
+   "fully_on_panel": [
+    "C01",
+    "C11"
+   ],
+   "n_layer_dependent": 2,
+   "layer_dependent": [
+    "C08",
+    "C09"
+   ],
+   "note": "Counted against purified_raw, the layer the scores use. Against raw_counts the count would be 3, adding C08."
+  },
+  "C01": {
+   "signal": "CXCL13 -> CXCR5",
+   "on_panel": [
+    "CXCL13",
+    "CXCR5"
+   ],
+   "missing": [],
+   "status": "complete",
+   "effect": "follicular positioning"
+  },
+  "C02": {
+   "signal": "CCL19/CCL21 -> CCR7",
+   "on_panel": [
+    "CCL21",
+    "CCR7"
+   ],
+   "missing": [
+    "CCL19"
+   ],
+   "status": "partial",
+   "effect": "T/DC positioning"
+  },
+  "C03": {
+   "signal": "LTa1b2 -> LTBR",
+   "on_panel": [],
+   "missing": [
+    "LTA",
+    "LTB",
+    "LTBR"
+   ],
+   "status": "absent",
+   "effect": "stromal organisation"
+  },
+  "C04": {
+   "signal": "CD40LG -> CD40",
+   "on_panel": [
+    "CD40LG"
+   ],
+   "missing": [
+    "CD40"
+   ],
+   "status": "receptor_absent",
+   "effect": "B help / APC licensing"
+  },
+  "C05": {
+   "signal": "IL-21 -> IL21R",
+   "on_panel": [
+    "IL2RG"
+   ],
+   "missing": [
+    "IL21",
+    "IL21R"
+   ],
+   "status": "absent",
+   "effect": "B expansion"
+  },
+  "C06": {
+   "signal": "BAFF -> BAFF-R/TACI/BCMA",
+   "on_panel": [
+    "TNFRSF13B",
+    "TNFRSF17"
+   ],
+   "missing": [
+    "TNFSF13B",
+    "TNFRSF13C"
+   ],
+   "status": "ligand_absent",
+   "effect": "B survival"
+  },
+  "C07": {
+   "signal": "APRIL -> TACI/BCMA",
+   "on_panel": [
+    "TNFRSF13B",
+    "TNFRSF17"
+   ],
+   "missing": [
+    "TNFSF13"
+   ],
+   "status": "ligand_absent",
+   "effect": "plasma-cell survival"
+  },
+  "C08": {
+   "signal": "pMHC-II -> TCR + CD4",
+   "on_panel": [
+    "HLA-DPB1",
+    "HLA-DQB2",
+    "CD74",
+    "CD4",
+    "CD3E"
+   ],
+   "missing": [],
+   "status": "layer_dependent",
+   "effect": "CD4 recognition",
+   "caveat": "complete in raw_counts; HLA-DPB1 and HLA-DQB2 are effectively absent from purified_raw, so only CD74, CD4 and CD3E survive in the scoring layer"
+  },
+  "C09": {
+   "signal": "pMHC-I -> TCR + CD8",
+   "on_panel": [
+    "HLA-A",
+    "CD8A",
+    "CD3E"
+   ],
+   "missing": [
+    "B2M",
+    "HLA-A (layer-sensitive)"
+   ],
+   "status": "layer_dependent",
+   "effect": "CD8 recognition"
+  },
+  "C10": {
+   "signal": "CD80/86 -> CD28",
+   "on_panel": [
+    "CD80",
+    "CD86"
+   ],
+   "missing": [
+    "CD28"
+   ],
+   "status": "receptor_absent",
+   "effect": "costimulation"
+  },
+  "C11": {
+   "signal": "CD80/86 <-> CTLA4",
+   "on_panel": [
+    "CD80",
+    "CD86",
+    "CTLA4"
+   ],
+   "missing": [],
+   "status": "complete",
+   "effect": "regulation of available costimulation"
+  },
+  "C12": {
+   "signal": "PD-L1 -> PD-1",
+   "on_panel": [
+    "CD274",
+    "PDCD1"
+   ],
+   "missing": [
+    "PDCD1LG2"
+   ],
+   "status": "partial_but_undetected",
+   "effect": "TCR modulation",
+   "caveat": "PDCD1 in 0.6% of CD8 cells"
+  },
+  "C13": {
+   "signal": "IFNg -> IFNGR1/2",
+   "on_panel": [],
+   "missing": [
+    "IFNG",
+    "IFNGR1",
+    "IFNGR2"
+   ],
+   "status": "absent",
+   "effect": "JAK/STAT1 response"
+  },
+  "C14": {
+   "signal": "IL-12 -> IL12RB1/2",
+   "on_panel": [],
+   "missing": [
+    "IL12A",
+    "IL12B",
+    "IL12RB1",
+    "IL12RB2"
+   ],
+   "status": "absent",
+   "effect": "effector support"
+  },
+  "C15": {
+   "signal": "IL-2 -> IL2RB + IL2RG",
+   "on_panel": [
+    "IL2RA",
+    "IL2RG"
+   ],
+   "missing": [
+    "IL2",
+    "IL2RB"
+   ],
+   "status": "partial",
+   "effect": "survival/expansion"
+  },
+  "C16": {
+   "signal": "IL-15 trans-presentation",
+   "on_panel": [
+    "IL2RG"
+   ],
+   "missing": [
+    "IL15",
+    "IL15RA",
+    "IL2RB"
+   ],
+   "status": "absent",
+   "effect": "NK/CD8 maintenance"
+  },
+  "C17": {
+   "signal": "IL-7 -> IL7R",
+   "on_panel": [
+    "IL2RG"
+   ],
+   "missing": [
+    "IL7",
+    "IL7R"
+   ],
+   "status": "absent",
+   "effect": "T homeostasis"
+  },
+  "C18": {
+   "signal": "CXCL9/10/11 -> CXCR3",
+   "on_panel": [
+    "CXCL9"
+   ],
+   "missing": [
+    "CXCL10",
+    "CXCL11",
+    "CXCR3"
+   ],
+   "status": "receptor_absent",
+   "effect": "T/NK recruitment"
+  },
+  "C19": {
+   "signal": "CCL2 -> CCR2",
+   "on_panel": [],
+   "missing": [
+    "CCL2",
+    "CCR2"
+   ],
+   "status": "absent",
+   "effect": "monocyte recruitment"
+  },
+  "C20": {
+   "signal": "CCL17/22 -> CCR4",
+   "on_panel": [
+    "CCL22"
+   ],
+   "missing": [
+    "CCL17",
+    "CCR4"
+   ],
+   "status": "receptor_absent",
+   "effect": "Treg positioning"
+  },
+  "C21": {
+   "signal": "CXCL8 -> CXCR1/2",
+   "on_panel": [
+    "CXCL5"
+   ],
+   "missing": [
+    "CXCL8",
+    "CXCL1",
+    "CXCL2",
+    "CXCR1",
+    "CXCR2"
+   ],
+   "status": "absent",
+   "effect": "neutrophil migration"
+  },
+  "C22": {
+   "signal": "CSF1/IL34 -> CSF1R",
+   "on_panel": [],
+   "missing": [
+    "CSF1",
+    "IL34",
+    "CSF1R"
+   ],
+   "status": "absent",
+   "effect": "macrophage survival"
+  },
+  "C23": {
+   "signal": "TNF -> TNFRSF1A/B",
+   "on_panel": [
+    "TNF"
+   ],
+   "missing": [
+    "TNFRSF1A",
+    "TNFRSF1B"
+   ],
+   "status": "receptor_absent",
+   "effect": "inflammation or conditional death"
+  },
+  "C24": {
+   "signal": "IL-1b -> IL1R1 + IL1RAP",
+   "on_panel": [
+    "IL1B"
+   ],
+   "missing": [
+    "IL1R1",
+    "IL1RAP"
+   ],
+   "status": "receptor_absent",
+   "effect": "inflammation",
+   "caveat": "transcript does not demonstrate mature IL-1b processing and release"
+  },
+  "C25": {
+   "signal": "IL-6 -> IL6R + gp130",
+   "on_panel": [
+    "IL6"
+   ],
+   "missing": [
+    "IL6R",
+    "IL6ST"
+   ],
+   "status": "receptor_absent",
+   "effect": "STAT3 response"
+  },
+  "C26": {
+   "signal": "TGFb -> TGFBR1/2",
+   "on_panel": [
+    "TGFB1"
+   ],
+   "missing": [
+    "TGFBR1",
+    "TGFBR2"
+   ],
+   "status": "receptor_absent",
+   "effect": "immune/stromal modulation",
+   "caveat": "TGFB1 RNA does not measure activation of latent TGFb"
+  },
+  "C27": {
+   "signal": "IL-10 -> IL10RA/RB",
+   "on_panel": [],
+   "missing": [
+    "IL10",
+    "IL10RA",
+    "IL10RB"
+   ],
+   "status": "absent",
+   "effect": "inflammatory modulation"
+  },
+  "C28": {
+   "signal": "VEGFA -> KDR",
+   "on_panel": [
+    "VEGFA",
+    "KDR"
+   ],
+   "missing": [
+    "FLT1"
+   ],
+   "status": "partial",
+   "effect": "vascular response"
+  },
+  "C29": {
+   "signal": "CXCL12 -> CXCR4",
+   "on_panel": [],
+   "missing": [
+    "CXCL12",
+    "CXCR4",
+    "ACKR3"
+   ],
+   "status": "absent",
+   "effect": "retention/migration"
+  },
+  "C30": {
+   "signal": "SPP1 -> CD44",
+   "on_panel": [
+    "SPP1",
+    "CD44"
+   ],
+   "missing": [
+    "ITGAV",
+    "ITGB1",
+    "ITGB3"
+   ],
+   "status": "partial",
+   "effect": "adhesion"
+  },
+  "C31": {
+   "signal": "perforin/granzyme; FASLG -> FAS",
+   "on_panel": [
+    "PRF1",
+    "GZMA",
+    "GZMB"
+   ],
+   "missing": [
+    "FASLG",
+    "FAS"
+   ],
+   "status": "partial",
+   "effect": "contact-dependent damage"
+  },
+  "C32": {
+   "signal": "HLA-E -> NKG2A",
+   "on_panel": [],
+   "missing": [
+    "HLA-E",
+    "KLRC1",
+    "KLRD1"
+   ],
+   "status": "absent",
+   "effect": "NK inhibition"
+  },
+  "C33": {
+   "signal": "MICA/B -> NKG2D",
+   "on_panel": [],
+   "missing": [
+    "MICA",
+    "MICB",
+    "ULBP1",
+    "ULBP2",
+    "KLRK1"
+   ],
+   "status": "absent",
+   "effect": "NK activation"
+  },
+  "C34": {
+   "signal": "CD39/CD73 -> adenosine receptors",
+   "on_panel": [],
+   "missing": [
+    "ENTPD1",
+    "NT5E",
+    "ADORA2A",
+    "ADORA2B"
+   ],
+   "status": "absent",
+   "effect": "metabolic regulation"
+  }
+ },
+ "decision_domains": {
+  "contact_behavior": {
+   "question_type": "choice",
+   "mutually_exclusive": true,
+   "description": "What the cell does at one of its existing interfaces this step."
+  },
+  "migration": {
+   "question_type": "choice",
+   "mutually_exclusive": true,
+   "description": "Which contact partner, if any, the cell displaces. The tissue is fully packed."
+  },
+  "secretion": {
+   "question_type": "score",
+   "mutually_exclusive": false,
+   "description": "Qualitative compatibility of a secretion programme with the stated context. Independent questions may share one request."
+  },
+  "stress_adaptation": {
+   "question_type": "score",
+   "mutually_exclusive": false,
+   "description": "Degree of adaptive response to a declared perturbation field."
+  },
+  "cycle": {
+   "question_type": "noul",
+   "mutually_exclusive": false,
+   "description": "Whether the context is permissive for cycle progression. The cycle itself is a timed engine state machine."
+  },
+  "differentiation": {
+   "question_type": "choice",
+   "mutually_exclusive": true,
+   "description": "Slow state transitions with history and lineage constraints. Disabled by default."
+  },
+  "survival": {
+   "question_type": null,
+   "mutually_exclusive": true,
+   "engine_owned": true,
+   "description": "Engine-controlled. Jev is never asked whether a cell dies."
+  }
+ },
+ "rules": [
+  {
+   "rule_id": "CD8_COGNATE_CONTACT_DEGRANULATION",
+   "action_id": "degranulate_at_contact_target",
+   "decision_domain": "contact_behavior",
+   "eligible_identities": [
+    "T_CD8_cytotoxic"
+   ],
+   "identity_conflict_policy": "require_all_candidates_in_lineage",
+   "capability": "degranulate",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "cell.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "target.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "contact.polygon_gap_um",
+      "op": "lte",
+      "value": 1.0,
+      "measurability": "observable"
+     },
+     {
+      "path": "target.identity.canonical_type",
+      "op": "in",
+      "value": [
+       "Tumor",
+       "Tumor_proliferating"
+      ],
+      "measurability": "partially_observable"
+     },
+     {
+      "path": "recognition.cognate_pMHC_I",
+      "op": "eq",
+      "value": true,
+      "measurability": "unobservable_by_design"
+     },
+     {
+      "path": "cell.effector_competence",
+      "op": "eq",
+      "value": true,
+      "measurability": "partially_observable"
+     },
+     {
+      "path": "cell.degranulation_cooldown_complete",
+      "op": "eq",
+      "value": true,
+      "measurability": "assumed_only"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "conditional_modulators": [
+    "checkpoint_input",
+    "energetic_state",
+    "recent_stimulation_history",
+    "target_resistance"
+   ],
+   "data_grounding": {
+    "section": {
+     "n_cells_of_type": 20082,
+     "p_contacts_tumor": 0.0138,
+     "n_eligible": 277,
+     "median_polygon_gap_to_tumor_um": 104.3
+    },
+    "patch_LUAD3_B26": {
+     "n_cells_of_type": 205,
+     "p_contacts_tumor": 0.049,
+     "n_eligible": 10
+    }
+   },
+   "effects": [
+    {
+     "event_type": "deliver_cytotoxic_damage_signal",
+     "recipient": "contact_target",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_death_module"
+    }
+   ],
+   "jev_question_template": "contact_behavior.cd8_at_tumor_interface",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "D-LUAD3",
+    "H-NSCLC",
+    "X-TISSUE"
+   ],
+   "source_ids": [
+    "R19",
+    "R24"
+   ],
+   "transfer_limitations": [
+    "No cited study estimates a per-cell LUAD degranulation rate.",
+    "A simulation producing frequent CD8-mediated killing is not reproducing this section."
+   ],
+   "target_conflict_policy": "require_all_candidates_in_lineage"
+  },
+  {
+   "rule_id": "MACROPHAGE_PRESENTS_MHCII_TO_CD4",
+   "action_id": "present_pmhcii_at_contact",
+   "decision_domain": "contact_behavior",
+   "eligible_identities": [
+    "Macrophage_SPP1"
+   ],
+   "identity_conflict_policy": "allow_any_candidate_match",
+   "capability": "antigen_presentation_mhcii",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "cell.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "contact.polygon_gap_um",
+      "op": "lte",
+      "value": 1.0,
+      "measurability": "observable"
+     },
+     {
+      "path": "target.identity.canonical_type",
+      "op": "in",
+      "value": [
+       "T_CD4"
+      ],
+      "measurability": "partially_observable"
+     },
+     {
+      "path": "cell.genes_detected",
+      "op": "contains",
+      "value": "CD74",
+      "measurability": "observable"
+     },
+     {
+      "path": "target.genes_detected",
+      "op": "contains_any",
+      "value": [
+       "CD3E",
+       "CD4"
+      ],
+      "measurability": "observable"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "conditional_modulators": [
+    "costimulation_available",
+    "ctla4_on_target"
+   ],
+   "data_grounding": {
+    "section": {
+     "n_cells_of_type": 7651,
+     "p_contacts_T_CD4": 0.402,
+     "p_contacts_T_CD8": 0.483,
+     "p_contacts_B_cell": 0.251,
+     "CD74_detection_in_Macrophage": 0.959,
+     "HLA_DPB1_detection_in_Macrophage_purified_raw": 0.029
+    },
+    "patch_LUAD3_B26": {
+     "n_cells_of_type": 47,
+     "p_contacts_T_CD4": 0.298,
+     "p_contacts_T_CD8": 0.787
+    }
+   },
+   "effects": [
+    {
+     "event_type": "deliver_pmhcii_signal",
+     "recipient": "contact_target",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_activation_module"
+    }
+   ],
+   "jev_question_template": "contact_behavior.apc_at_t_interface",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "D-LUAD3",
+    "H-NSCLC"
+   ],
+   "source_ids": [
+    "R13",
+    "R17"
+   ],
+   "notes": [
+    "C08 is complete in raw_counts but layer-dependent in purified_raw: HLA-DPB1 and HLA-DQB2 are effectively deleted by the SPLIT correction. The gate therefore rests on CD74, the invariant chain, and the state records that MHC-II itself is unmeasured in the scoring layer.",
+    "This remains the most spatially eligible circuit in the section, which is why it is worth modelling despite the weaker molecular evidence."
+   ]
+  },
+  {
+   "rule_id": "APC_CTLA4_COSTIM_WITHDRAWAL",
+   "action_id": "withdraw_costimulation_at_contact",
+   "decision_domain": "contact_behavior",
+   "eligible_identities": [
+    "Macrophage_SPP1",
+    "B_cell"
+   ],
+   "capability": "costimulate",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "contact.polygon_gap_um",
+      "op": "lte",
+      "value": 1.0,
+      "measurability": "observable"
+     },
+     {
+      "path": "cell.genes_detected",
+      "op": "contains_any",
+      "value": [
+       "CD80",
+       "CD86"
+      ],
+      "measurability": "observable"
+     },
+     {
+      "path": "target.genes_detected",
+      "op": "contains",
+      "value": "CTLA4",
+      "measurability": "observable"
+     },
+     {
+      "path": "target.identity.canonical_type",
+      "op": "in",
+      "value": [
+       "T_CD4",
+       "T_CD8_cytotoxic"
+      ],
+      "measurability": "partially_observable"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "data_grounding": {
+    "section": {
+     "CTLA4_detection_in_T_CD8": 0.179,
+     "CTLA4_detection_in_T_CD4": 0.099,
+     "CD86_detection_in_Macrophage": 0.188
+    }
+   },
+   "effects": [
+    {
+     "event_type": "reduce_available_costimulation",
+     "recipient": "contact_target",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_activation_module"
+    }
+   ],
+   "jev_question_template": "contact_behavior.apc_at_t_interface",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "D-LUAD3",
+    "X-TISSUE"
+   ],
+   "source_ids": [
+    "R31"
+   ],
+   "notes": [
+    "C11 is fully on panel. Encode as a contact mechanism, never as a diffusible toxin.",
+    "No Treg label exists in this section, so this is not a Treg rule."
+   ],
+   "identity_conflict_policy": "allow_any_candidate_match"
+  },
+  {
+   "rule_id": "B_FOLLICULAR_POSITIONING",
+   "action_id": "hold_follicular_position",
+   "decision_domain": "migration",
+   "eligible_identities": [
+    "B_cell"
+   ],
+   "capability": "migrate",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "cell.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "cell.genes_detected",
+      "op": "contains",
+      "value": "CXCR5",
+      "measurability": "observable"
+     },
+     {
+      "path": "neighbourhood_30um.cxcl13_source_present",
+      "op": "eq",
+      "value": true,
+      "measurability": "observable"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "data_grounding": {
+    "section": {
+     "CXCR5_detection_in_B_cell": 0.25,
+     "CXCL13_detection_in_B_cell": 0.506,
+     "p_B_contacts_B": 0.916,
+     "b_b_interface_share": 0.671
+    },
+    "patch_LUAD3_B26": {
+     "n_cells_of_type": 381,
+     "p_contacts_B": 0.966
+    }
+   },
+   "effects": [
+    {
+     "event_type": "set_migration_bias",
+     "recipient": "self",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_movement_module"
+    }
+   ],
+   "jev_question_template": "migration.positional_behaviour",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "D-LUAD3",
+    "H-NSCLC"
+   ],
+   "source_ids": [
+    "R11",
+    "R12"
+   ],
+   "notes": [
+    "C01 is fully on panel, but CXCL13 detection in this section is highest in B cells themselves, which inverts the canonical source and must be verified.",
+    "Inside a follicle the neighbourhood is ~70% B cells, so a diffusible field is effectively uniform and provides no gradient to follow."
+   ],
+   "identity_conflict_policy": "allow_any_candidate_match"
+  },
+  {
+   "rule_id": "CAF_TUMOR_INTERFACE_MATRIX",
+   "action_id": "deposit_matrix_at_tumor_interface",
+   "decision_domain": "secretion",
+   "eligible_identities": [
+    "CAF",
+    "Fibroblast"
+   ],
+   "capability": "deposit_matrix",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "cell.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "contact.polygon_gap_um",
+      "op": "lte",
+      "value": 1.0,
+      "measurability": "observable"
+     },
+     {
+      "path": "target.identity.canonical_type",
+      "op": "in",
+      "value": [
+       "Tumor",
+       "Tumor_proliferating"
+      ],
+      "measurability": "partially_observable"
+     },
+     {
+      "path": "cell.genes_detected",
+      "op": "contains_any",
+      "value": [
+       "COL1A1",
+       "FAP",
+       "POSTN",
+       "TNC"
+      ],
+      "measurability": "observable"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "conditional_modulators": [
+    "tgfb_scenario",
+    "hypoxia_field"
+   ],
+   "data_grounding": {
+    "section": {
+     "n_cells_of_type": 6592,
+     "p_CAF_contacts_tumor": 0.598,
+     "caf_tumor_interface_share": 0.208,
+     "median_gap_to_tumor_um": 0.1,
+     "p_Fibroblast_contacts_tumor": 0.235
+    },
+    "patch_LUAD3_B26": {
+     "n_CAF": 19,
+     "p_CAF_contacts_tumor": 0.895,
+     "n_Fibroblast": 70,
+     "p_Fibroblast_contacts_tumor": 0.5
+    }
+   },
+   "effects": [
+    {
+     "event_type": "increase_local_matrix_density",
+     "recipient": "interface",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_matrix_module"
+    }
+   ],
+   "jev_question_template": "secretion.matrix_programme",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "D-LUAD3",
+    "H-NSCLC"
+   ],
+   "source_ids": [
+    "R02",
+    "R18"
+   ],
+   "notes": [
+    "This is the circuit that is actually eligible at scale in this section, and the mechanism behind the measured immune exclusion.",
+    "No matrix-architecture channel was measured. Density and orientation are SIM variables the engine owns."
+   ],
+   "identity_conflict_policy": "allow_any_candidate_match"
+  },
+  {
+   "rule_id": "TUMOR_VEGFA_SECRETION",
+   "action_id": "secrete_vegfa",
+   "decision_domain": "secretion",
+   "eligible_identities": [
+    "Tumor",
+    "Tumor_proliferating",
+    "CAF",
+    "Macrophage_SPP1"
+   ],
+   "capability": "secrete_vegfa",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "cell.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "cell.genes_detected",
+      "op": "contains",
+      "value": "VEGFA",
+      "measurability": "observable"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "conditional_modulators": [
+    "hypoxia_field",
+    "energetic_state"
+   ],
+   "data_grounding": {
+    "section": {
+     "VEGFA_detection_in_Tumor": 0.52,
+     "VEGFA_detection_in_CAF": 0.182,
+     "VEGFA_detection_in_Macrophage": 0.174,
+     "KDR_detection_in_Endothelial": 0.239
+    }
+   },
+   "effects": [
+    {
+     "event_type": "emit_vegfa_into_field",
+     "recipient": "field.vegfa",
+     "magnitude": null,
+     "units": "dimensionless_scenario",
+     "consequence_owner": "engine_field_module"
+    }
+   ],
+   "jev_question_template": "secretion.vegfa_programme",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "D-LUAD3",
+    "H-NSCLC"
+   ],
+   "source_ids": [
+    "R02"
+   ],
+   "notes": [
+    "C28 is the only near-complete vascular edge. FLT1 is not_assayed, so the modulating arm of the axis is missing."
+   ],
+   "identity_conflict_policy": "allow_any_candidate_match"
+  },
+  {
+   "rule_id": "ENDOTHELIAL_SPROUTING",
+   "action_id": "initiate_sprout",
+   "decision_domain": "differentiation",
+   "eligible_identities": [
+    "Endothelial"
+   ],
+   "capability": "angiogenic_response",
+   "enabled_by_default": false,
+   "required_conditions": {
+    "all": [
+     {
+      "path": "cell.genes_detected",
+      "op": "contains",
+      "value": "KDR",
+      "measurability": "observable"
+     },
+     {
+      "path": "field.vegfa",
+      "op": "gte",
+      "value": "scenario.sprout_threshold",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "perturbation.angiogenesis.active",
+      "op": "eq",
+      "value": true,
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "geometry.displaceable_partner_available",
+      "op": "eq",
+      "value": true,
+      "measurability": "observable"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "data_grounding": {
+    "section": {
+     "n_cells_of_type": 11182,
+     "KDR_detection": 0.239,
+     "PECAM1_detection": 0.656
+    }
+   },
+   "effects": [
+    {
+     "event_type": "extend_vascular_geometry",
+     "recipient": "self",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_vascular_module"
+    }
+   ],
+   "jev_question_template": "differentiation.endothelial_sprout",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "SIM",
+    "H-NSCLC"
+   ],
+   "source_ids": [
+    "R02"
+   ],
+   "notes": [
+    "Angiogenic signalling does not instantly create perfusion. A sprout extends geometry only; whether the new segment carries oxygen is a separate engine decision.",
+    "The tissue is fully tiled, so a sprout must displace existing cells."
+   ],
+   "identity_conflict_policy": "require_all_candidates_in_lineage"
+  },
+  {
+   "rule_id": "HYPOXIA_ADAPTATION",
+   "action_id": "engage_hypoxia_adaptation",
+   "decision_domain": "stress_adaptation",
+   "eligible_identities": [
+    "Tumor",
+    "Tumor_proliferating",
+    "CAF",
+    "Fibroblast",
+    "Macrophage_SPP1",
+    "Endothelial",
+    "T_CD8_cytotoxic",
+    "T_CD4",
+    "B_cell",
+    "Plasma_cell"
+   ],
+   "capability": "adapt_to_hypoxia",
+   "enabled_by_default": false,
+   "required_conditions": {
+    "all": [
+     {
+      "path": "perturbation.hypoxia.active",
+      "op": "eq",
+      "value": true,
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "field.oxygen",
+      "op": "lte",
+      "value": "scenario.hypoxia_threshold",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "cell.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "data_grounding": {
+    "section": {
+     "nearest_endothelial_distance_is_the_only_measured_proxy": true,
+     "hypoxia_signature_coverage": 0.0486,
+     "hypoxia_signature_flag": "low_coverage",
+     "canonical_hypoxia_genes_absent": [
+      "CA9",
+      "EGLN3",
+      "BNIP3",
+      "HIF1A"
+     ]
+    }
+   },
+   "effects": [
+    {
+     "event_type": "set_metabolic_adaptation_level",
+     "recipient": "self",
+     "magnitude": null,
+     "units": "ordinal_0_to_3",
+     "consequence_owner": "engine_metabolism_module"
+    }
+   ],
+   "jev_question_template": "stress_adaptation.hypoxia_response",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "SIM",
+    "X-TISSUE"
+   ],
+   "source_ids": [
+    "R21",
+    "R22"
+   ],
+   "notes": [
+    "pO2 was never measured. The oxygen field is entirely SIM and must be labelled dimensionless, never nM or mmHg.",
+    "Distance to the nearest endothelial cell is a geometric proxy and must not be renamed oxygen_level.",
+    "Glycolysis and respiration coexist in human lung tumours; do not implement a universal glycolytic switch."
+   ],
+   "identity_conflict_policy": "allow_any_candidate_match"
+  },
+  {
+   "rule_id": "TUMOR_CYCLE_PERMISSIVE",
+   "action_id": "advance_cell_cycle",
+   "decision_domain": "cycle",
+   "eligible_identities": [
+    "Tumor",
+    "Tumor_proliferating"
+   ],
+   "capability": "proliferate",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "cell.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "cell.cycle_state",
+      "op": "neq",
+      "value": "arrested",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "geometry.displaceable_partner_available",
+      "op": "eq",
+      "value": true,
+      "measurability": "observable"
+     },
+     {
+      "path": "resources.sufficient",
+      "op": "eq",
+      "value": true,
+      "measurability": "assumed_only"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "conditional_modulators": [
+    "hypoxia_field",
+    "energetic_state",
+    "resistance_mutation_scenario"
+   ],
+   "data_grounding": {
+    "section": {
+     "MKI67_detection_in_Tumor": 0.014,
+     "MKI67_detection_in_Tumor_proliferating": 0.033,
+     "UBE2C_detection_in_Tumor": 0.042,
+     "UBE2C_detection_in_Tumor_proliferating": 0.146,
+     "mitotic_signature_coverage": 0.0188
+    }
+   },
+   "effects": [
+    {
+     "event_type": "advance_cycle_phase",
+     "recipient": "self",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_cycle_module"
+    }
+   ],
+   "jev_question_template": "cycle.permissive_context",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "D-LUAD3"
+   ],
+   "source_ids": [
+    "R05"
+   ],
+   "notes": [
+    "Jev is asked whether the CONTEXT is permissive, never whether the cell divides. Division is a timed engine state machine.",
+    "Division requires displacing a neighbour, because the tissue is fully packed."
+   ],
+   "identity_conflict_policy": "require_all_candidates_in_lineage"
+  },
+  {
+   "rule_id": "MACROPHAGE_EFFEROCYTOSIS",
+   "action_id": "efferocytose_contact_target",
+   "decision_domain": "contact_behavior",
+   "eligible_identities": [
+    "Macrophage_SPP1"
+   ],
+   "capability": "phagocytose",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "contact.polygon_gap_um",
+      "op": "lte",
+      "value": 1.0,
+      "measurability": "observable"
+     },
+     {
+      "path": "target.viability_state",
+      "op": "in",
+      "value": [
+       "apoptosis_committed",
+       "dead_intact"
+      ],
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "cell.processing_capacity_available",
+      "op": "eq",
+      "value": true,
+      "measurability": "assumed_only"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "data_grounding": {
+    "section": {
+     "note": "No death state is observed anywhere in LUAD3. Every apoptotic target is engine-created, so this rule is ineligible at t=0 by construction."
+    }
+   },
+   "effects": [
+    {
+     "event_type": "consume_apoptotic_target",
+     "recipient": "contact_target",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_clearance_module"
+    }
+   ],
+   "jev_question_template": "contact_behavior.macrophage_clearance",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "X-TISSUE",
+    "SIM"
+   ],
+   "source_ids": [
+    "R04",
+    "R07"
+   ],
+   "notes": [
+    "One apoptotic body may be consumed once per update by one phagocyte."
+   ],
+   "identity_conflict_policy": "require_all_candidates_in_lineage",
+   "target_conflict_policy": "require_all_candidates_in_lineage"
+  },
+  {
+   "rule_id": "PLASMA_CELL_SECRETION",
+   "action_id": "secrete_immunoglobulin",
+   "decision_domain": "secretion",
+   "eligible_identities": [
+    "Plasma_cell"
+   ],
+   "capability": "secrete_immunoglobulin",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "cell.viability_state",
+      "op": "eq",
+      "value": "alive",
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "cell.genes_detected",
+      "op": "contains_any",
+      "value": [
+       "MZB1",
+       "XBP1"
+      ],
+      "measurability": "observable"
+     },
+     {
+      "path": "cell.identity.agreement",
+      "op": "in",
+      "value": [
+       "concordant_exact",
+       "concordant_lineage"
+      ],
+      "measurability": "observable"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "data_grounding": {
+    "section": {
+     "n_cells_of_type": 12907,
+     "XBP1_detection": 0.97,
+     "MZB1_detection": 0.534,
+     "ER_stress_median": 0.279,
+     "conflict_B_vs_plasma": 7722
+    }
+   },
+   "effects": [
+    {
+     "event_type": "emit_immunoglobulin",
+     "recipient": "field.ig",
+     "magnitude": null,
+     "units": "dimensionless_scenario",
+     "consequence_owner": "engine_field_module"
+    }
+   ],
+   "jev_question_template": "secretion.ig_programme",
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "D-LUAD3",
+    "H-NSCLC"
+   ],
+   "source_ids": [
+    "R12",
+    "R14",
+    "R15"
+   ],
+   "notes": [
+    "Antibody specificity is unknown: no V(D)J data. Quantity establishes no antitumour activity.",
+    "The gate accepts lineage-level agreement because first_type has no Plasma_cell category: a plasma cell can never be exact-concordant. Requiring exact agreement froze the entire plasma compartment, which was a vocabulary artefact, not biology."
+   ],
+   "identity_conflict_policy": "allow_any_candidate_match"
+  },
+  {
+   "rule_id": "TREG_SUPPRESSION",
+   "action_id": "suppress_at_contact",
+   "decision_domain": "contact_behavior",
+   "eligible_identities": [
+    "T_CD4"
+   ],
+   "capability": "regulate_costimulation",
+   "enabled_by_default": false,
+   "disabled_reason": "No Treg label exists in this section and FOXP3 is detected in 4.1% of CD4 cells, which cannot call Tregs per cell. Enable only inside a declared identity_scenario.",
+   "required_conditions": {
+    "all": [
+     {
+      "path": "identity_scenario.treg_declared",
+      "op": "eq",
+      "value": true,
+      "measurability": "assumed_only"
+     },
+     {
+      "path": "contact.polygon_gap_um",
+      "op": "lte",
+      "value": 1.0,
+      "measurability": "observable"
+     }
+    ]
+   },
+   "missing_required_evidence_policy": "withhold_action_and_log_unknown",
+   "data_grounding": {
+    "section": {
+     "FOXP3_detection_in_T_CD4": 0.041
+    }
+   },
+   "effects": [
+    {
+     "event_type": "reduce_available_costimulation",
+     "recipient": "contact_target",
+     "magnitude": null,
+     "units": null,
+     "consequence_owner": "engine_activation_module"
+    }
+   ],
+   "jev_question_template": null,
+   "probability_semantics": "model_preference_until_event_calibration",
+   "event_rate": null,
+   "calibration_status": "not_calibrated",
+   "evidence_scope": [
+    "SIM",
+    "X-TISSUE"
+   ],
+   "source_ids": [
+    "R03",
+    "R31"
+   ],
+   "identity_conflict_policy": "require_all_candidates_in_lineage"
+  }
+ ],
+ "perturbations": {
+  "_policy": "Every perturbation is SIM. It declares state variables the engine owns, capabilities it unlocks, and what LUAD3 can and cannot show about it. A run under any perturbation is reportable separately and never comparable to a baseline run without labelling the difference as scenario-driven.",
+  "hypoxia": {
+   "label": "Hypoxia",
+   "evidence_scope": [
+    "SIM"
+   ],
+   "state_variables": {
+    "field.oxygen": {
+     "type": "number",
+     "units": "dimensionless_scenario",
+     "range": [
+      0,
+      1
+     ],
+     "forbidden_units": [
+      "mmHg",
+      "nM",
+      "percent_saturation"
+     ],
+     "seed": "monotone decreasing function of distance to the nearest Endothelial cell, which is measured; the mapping itself is SIM",
+     "note": "A segmented vessel does not establish perfusion. pO2 was never measured."
+    },
+    "scenario.hypoxia_threshold": {
+     "type": "number",
+     "default": 0.3,
+     "units": "dimensionless_scenario"
+    },
+    "cell.metabolic_adaptation": {
+     "type": "integer",
+     "range": [
+      0,
+      3
+     ]
+    }
+   },
+   "unlocks_rules": [
+    "HYPOXIA_ADAPTATION"
+   ],
+   "modulates_rules": [
+    "TUMOR_CYCLE_PERMISSIVE",
+    "TUMOR_VEGFA_SECRETION",
+    "CAF_TUMOR_INTERFACE_MATRIX"
+   ],
+   "measured_correlates": {
+    "available": [
+     "nearest_endothelial_distance_2d_um",
+     "GOBP_RESPONSE_TO_OXYGEN_LEVELS (17/350 genes, low_coverage)",
+     "SLC2A1 detection (Tumor 16.9%)",
+     "VEGFA detection (Tumor 52.0%)"
+    ],
+    "not_available": [
+     "pO2",
+     "perfusion",
+     "CA9",
+     "EGLN3",
+     "BNIP3",
+     "HIF1A",
+     "lactate",
+     "pH"
+    ]
+   },
+   "reporting_requirement": "Any claim about hypoxia in a run must state that the oxygen field is a scenario construct with no measured counterpart in LUAD3."
+  },
+  "angiogenesis": {
+   "label": "Angiogenesis",
+   "evidence_scope": [
+    "SIM",
+    "H-NSCLC"
+   ],
+   "state_variables": {
+    "field.vegfa": {
+     "type": "number",
+     "units": "dimensionless_scenario",
+     "range": [
+      0,
+      1
+     ],
+     "seed": "emission from VEGFA-detected cells, diffused on the contact graph"
+    },
+    "scenario.sprout_threshold": {
+     "type": "number",
+     "default": 0.5,
+     "units": "dimensionless_scenario"
+    },
+    "vessel.segment_perfused": {
+     "type": "boolean",
+     "default": false
+    }
+   },
+   "unlocks_rules": [
+    "ENDOTHELIAL_SPROUTING"
+   ],
+   "modulates_rules": [
+    "HYPOXIA_ADAPTATION"
+   ],
+   "measured_correlates": {
+    "available": [
+     "VEGFA detection by cell type",
+     "KDR detection in Endothelial (23.9%)",
+     "PECAM1 (65.6%)",
+     "PLVAP (43.0%)",
+     "endothelial positions and polygons"
+    ],
+    "not_available": [
+     "FLT1",
+     "vessel lumen",
+     "perfusion",
+     "HEV (PNAd/MECA-79 is a glycan)",
+     "lymphatic vs blood separation"
+    ]
+   },
+   "constraints": [
+    "Endothelial proliferation does not instantly create a perfused vessel.",
+    "A sprout must displace existing cells; the tissue has no void.",
+    "Immune influx requires an explicit external reservoir and parameterised entry rate, which this rulebook does not supply."
+   ],
+   "reporting_requirement": "A run may show vascular geometry changing. It may not report perfusion or oxygen delivery as an outcome unless the perfusion model is separately declared."
+  },
+  "resistance_mutation": {
+   "label": "Treatment-resistance mutation",
+   "evidence_scope": [
+    "SIM",
+    "H-LUAD"
+   ],
+   "state_variables": {
+    "scenario.genotype": {
+     "type": "string",
+     "enum": [
+      "unknown",
+      "EGFR_mutant",
+      "KRAS_mutant",
+      "STK11_loss",
+      "KEAP1_loss",
+      "custom"
+     ],
+     "default": "unknown"
+    },
+    "scenario.resistance_mechanism": {
+     "type": "string",
+     "enum": [
+      "none",
+      "bypass_MET",
+      "bypass_ERBB2",
+      "EMT_ZEB1",
+      "AXL_upregulation",
+      "custom"
+     ],
+     "default": "none"
+    },
+    "cell.drug_sensitivity": {
+     "type": "number",
+     "range": [
+      0,
+      1
+     ],
+     "units": "dimensionless_scenario"
+    },
+    "scenario.treatment_active": {
+     "type": "boolean",
+     "default": false
+    }
+   },
+   "unlocks_rules": [],
+   "modulates_rules": [
+    "TUMOR_CYCLE_PERMISSIVE",
+    "HYPOXIA_ADAPTATION"
+   ],
+   "measured_correlates": {
+    "available": [
+     "EGFR detection in Tumor (80.0%)",
+     "MET (80.2%)",
+     "ERBB2",
+     "AXL",
+     "YAP1",
+     "ZEB1",
+     "note: these are EXPRESSION, and expression of EGFR does not establish an EGFR mutation"
+    ],
+    "not_available": [
+     "KRAS",
+     "STK11",
+     "KEAP1",
+     "NFE2L2",
+     "any DNA-level variant",
+     "treatment history",
+     "stage",
+     "histological pattern"
+    ]
+   },
+   "constraints": [
+    "LUAD3 has no genotype metadata. scenario.genotype is a declaration, never an inference.",
+    "A transcript signature cannot establish a mutation. Do not read NRF2-target expression as KEAP1 loss.",
+    "Genotype changes dependencies; it does not change lineage or repertoire."
+   ],
+   "reporting_requirement": "Every figure from a resistance run must name the declared genotype and state that it was assigned, not measured."
+  },
+  "checkpoint_blockade": {
+   "label": "Checkpoint blockade (anti-PD-1 / anti-PD-L1)",
+   "evidence_scope": [
+    "SIM",
+    "H-NSCLC"
+   ],
+   "state_variables": {
+    "scenario.checkpoint_axis_declared": {
+     "type": "boolean",
+     "default": false
+    },
+    "cell.pd1_state": {
+     "type": "string",
+     "enum": [
+      "unknown",
+      "declared_positive",
+      "declared_negative"
+     ],
+     "default": "unknown"
+    },
+    "scenario.blockade_efficacy": {
+     "type": "number",
+     "range": [
+      0,
+      1
+     ],
+     "units": "dimensionless_scenario"
+    }
+   },
+   "unlocks_rules": [],
+   "modulates_rules": [
+    "CD8_COGNATE_CONTACT_DEGRANULATION",
+    "APC_CTLA4_COSTIM_WITHDRAWAL"
+   ],
+   "measured_correlates": {
+    "available": [
+     "CD274 detection (Tumor 5.1%, Macrophage 7.0%)",
+     "CTLA4 (T_CD8 17.9%)",
+     "LAG3 (3.7%)",
+     "TIGIT (20.1%)"
+    ],
+    "not_available": [
+     "PDCD1 at usable rates: 0.6% of CD8 cells, 0.3% of all cells",
+     "PDCD1LG2",
+     "protein-level PD-1 or PD-L1",
+     "treatment response"
+    ]
+   },
+   "constraints": [
+    "This axis is entirely a declared scenario. Setting cell.pd1_state is an assignment, not an observation.",
+    "Because CD8-tumour contact occurs in 1.38% of CD8 cells, relieving inhibition changes very few cells. A blockade run that produces large tumour killing is reporting the migration model, not the checkpoint model."
+   ],
+   "reporting_requirement": "State the assumed PD-1 prevalence explicitly, since the data supply none."
+  },
+  "inflammation": {
+   "label": "Inflammation / cytokine surge",
+   "evidence_scope": [
+    "SIM",
+    "X-TISSUE"
+   ],
+   "state_variables": {
+    "field.tnf": {
+     "type": "number",
+     "units": "dimensionless_scenario",
+     "range": [
+      0,
+      1
+     ]
+    },
+    "field.il1b": {
+     "type": "number",
+     "units": "dimensionless_scenario",
+     "range": [
+      0,
+      1
+     ]
+    },
+    "field.il6": {
+     "type": "number",
+     "units": "dimensionless_scenario",
+     "range": [
+      0,
+      1
+     ]
+    },
+    "field.ifng": {
+     "type": "number",
+     "units": "dimensionless_scenario",
+     "range": [
+      0,
+      1
+     ],
+     "note": "IFNG is not on the panel at all. Nothing in this dataset identifies an IFNg source."
+    },
+    "scenario.pathogen_enabled": {
+     "type": "boolean",
+     "default": false
+    },
+    "actual_microbial_status": {
+     "type": "string",
+     "const": "unknown"
+    }
+   },
+   "unlocks_rules": [],
+   "modulates_rules": [
+    "MACROPHAGE_PRESENTS_MHCII_TO_CD4",
+    "CAF_TUMOR_INTERFACE_MATRIX",
+    "TUMOR_CYCLE_PERMISSIVE"
+   ],
+   "measured_correlates": {
+    "available": [
+     "TNF, IL1B, IL6, CXCL9, CCL22, CXCL5 as LIGAND transcripts"
+    ],
+    "not_available": [
+     "TNFRSF1A",
+     "TNFRSF1B",
+     "IL1R1",
+     "IL1RAP",
+     "IL6R",
+     "IL6ST",
+     "IFNG",
+     "IFNGR1",
+     "IFNGR2",
+     "IL10",
+     "IL10RA",
+     "note: every receptor for every cytokine in this perturbation is not_assayed, so recipient competence is assumed throughout"
+    ]
+   },
+   "constraints": [
+    "IL1B transcript does not demonstrate mature IL-1b processing and release.",
+    "TNF must not always trigger apoptosis.",
+    "LUAD alone establishes no pathogen. Keep scenario.pathogen_enabled false unless explicitly declared; endogenous injury generates DAMPs without infection.",
+    "A generic 'inflammation' field is acceptable for a demonstration only if its composite nature is explicit."
+   ],
+   "reporting_requirement": "Any inflammation run must be labelled as operating under an assumed_competence_profile, because no cytokine receptor in it is measured."
+  }
+ },
+ "assumed_competence_profiles": {
+  "none": {
+   "description": "Default. Rules requiring not_assayed components stay ineligible.",
+   "assumptions": []
+  },
+  "canonical_lineage_receptors_v1": {
+   "description": "Assume canonical lineage receptor expression to explore circuit behaviour. Every decision made under this profile is tagged.",
+   "rationale": "The panel lacks receptor probes for 31 of 34 interaction edges.",
+   "assumptions": [
+    {
+     "cell_types": [
+      "T_CD8_cytotoxic",
+      "T_CD4",
+      "B_cell",
+      "Macrophage_SPP1",
+      "Tumor",
+      "Tumor_proliferating"
+     ],
+     "component": "IFNGR1/IFNGR2",
+     "assumed": "competent",
+     "basis": "X-TISSUE canonical",
+     "measured": false
+    },
+    {
+     "cell_types": [
+      "B_cell"
+     ],
+     "component": "CD40",
+     "assumed": "competent",
+     "basis": "X-TISSUE canonical",
+     "measured": false
+    },
+    {
+     "cell_types": [
+      "Macrophage_SPP1"
+     ],
+     "component": "CSF1R",
+     "assumed": "competent",
+     "basis": "X-TISSUE canonical",
+     "measured": false
+    },
+    {
+     "cell_types": [
+      "CAF",
+      "Fibroblast",
+      "Tumor",
+      "Tumor_proliferating"
+     ],
+     "component": "TGFBR1/TGFBR2",
+     "assumed": "competent",
+     "basis": "X-TISSUE canonical",
+     "measured": false
+    },
+    {
+     "cell_types": [
+      "T_CD8_cytotoxic",
+      "T_CD4"
+     ],
+     "component": "CD28",
+     "assumed": "competent",
+     "basis": "X-TISSUE canonical",
+     "measured": false
+    }
+   ],
+   "propagation": "Every decision log entry carries profile_id and assumption_count.",
+   "must_not": "Be reported as an observation, or compared against a profile-free run without labelling the difference as assumption-driven."
+  }
+ },
+ "engine_constraints": [
+  {
+   "id": "H01",
+   "constraint": "Dead or removed cells do not choose active behaviours.",
+   "basis": "biological/computational"
+  },
+  {
+   "id": "H02",
+   "constraint": "An action must belong to the authorised identity/state repertoire.",
+   "basis": "model scope"
+  },
+  {
+   "id": "H03",
+   "constraint": "Conventional T cytotoxicity requires contact, a target and cognate recognition.",
+   "basis": "mechanistic"
+  },
+  {
+   "id": "H04",
+   "constraint": "Contact is the polygon graph, never inferred from arbitrary proximity.",
+   "basis": "geometry",
+   "supersedes": "H16"
+  },
+  {
+   "id": "H05",
+   "constraint": "Division requires a completed cycle, resources, a displaceable neighbour and a competent identity.",
+   "basis": "biological"
+  },
+  {
+   "id": "H06",
+   "constraint": "Cells and mediators require recorded origins.",
+   "basis": "accounting"
+  },
+  {
+   "id": "H07",
+   "constraint": "Multicomponent receptors and ligands need the relevant mechanism; distinguish incompatibility from missing measurement.",
+   "basis": "biological"
+  },
+  {
+   "id": "H08",
+   "constraint": "Irreversible death commitment overrides behaviour selection. Jev cannot reverse an executed terminal event.",
+   "basis": "model convention"
+  },
+  {
+   "id": "H09",
+   "constraint": "State changes preserve identity and history unless an authorised transition applies.",
+   "basis": "ontology"
+  },
+  {
+   "id": "H10",
+   "constraint": "Use a common tissue snapshot and resolve incompatible events in the engine.",
+   "basis": "computational"
+  },
+  {
+   "id": "H11",
+   "constraint": "Resources, concentrations and counts cannot be negative; clipping alone must not hide instability.",
+   "basis": "numerical"
+  },
+  {
+   "id": "H12",
+   "constraint": "Missing information cannot become an observed fact.",
+   "basis": "evidence handling"
+  },
+  {
+   "id": "H13",
+   "constraint": "A raw UCell value may not appear in any threshold, rate or magnitude. Only percentile_within_type or depth_residual may.",
+   "basis": "D-LUAD3: rho up to 0.81 with detection depth"
+  },
+  {
+   "id": "H14",
+   "constraint": "A signature flagged identity_confounded or low_coverage may not be the sole evidence for a capability gate.",
+   "basis": "D-LUAD3: no signature has both adequate coverage and no identity confound"
+  },
+  {
+   "id": "H15",
+   "constraint": "Identity conflicts propagate. A cell with agreement=conflict may act only in the intersection of its candidate repertoires unless an identity_scenario is declared.",
+   "basis": "D-LUAD3: 34.85% concordance"
+  },
+  {
+   "id": "H16",
+   "constraint": "SUPERSEDED by H04. Formerly: membrane contact may never be true from this dataset.",
+   "status": "superseded"
+  },
+  {
+   "id": "H17",
+   "constraint": "A rule requiring a not_assayed component is ineligible unless an assumed_competence_profile is active, and every decision made under one is tagged.",
+   "basis": "D-LUAD3: 31 of 34 edges incomplete"
+  },
+  {
+   "id": "H18",
+   "constraint": "The tissue is a near-complete tiling. Movement and division must displace, never occupy void.",
+   "basis": "D-LUAD3: mean 6.11 contacts, ~full perimeter contacted"
+  },
+  {
+   "id": "H19",
+   "constraint": "The 16,591 segmented cells absent from the AnnData are instantiated as occluded_neighbour: they occupy space and receive imposed damage, but have no identity, state, repertoire or Jev call.",
+   "basis": "D-LUAD3: 7.5% of all contacts, 28.2% of cells affected, biased by cell type"
+  },
+  {
+   "id": "H20",
+   "constraint": "Jev is never asked whether a cell dies, divides, or what its identity is. It is asked to rank admissible behaviours that code has already validated.",
+   "basis": "SIM"
+  },
+  {
+   "id": "H21",
+   "constraint": "A Jev option-probability is not an event rate. It may not be converted to a per-step hazard without an independently validated calibration.",
+   "basis": "METHOD"
+  }
+ ],
+ "jev": {
+  "provider": "TypeSafe AI",
+  "model_class": "System One",
+  "endpoint": "https://api.typesafe.ai/v1/systemone",
+  "method": "POST",
+  "auth": "Authorization: Bearer <API_KEY>",
+  "model": "jev-latest",
+  "model_pinning": "Record the returned `model` identifier with every decision. Use a pinned version for any defined experiment; jev-latest can change.",
+  "documented_limits": {
+   "context_tokens": 64000,
+   "latency_ms": [
+    70,
+    500
+   ],
+   "max_choice_options": 255,
+   "score_levels": [
+    2,
+    10
+   ],
+   "pricing": "one credit per 1000 input tokens; output tokens free"
+  },
+  "primitives": {
+   "choice": {
+    "request": [
+     "type",
+     "instructions",
+     "criteria"
+    ],
+    "criteria_shape": "object mapping option key to description",
+    "response": [
+     "type",
+     "choice",
+     "probabilities",
+     "confidence"
+    ],
+    "semantics": "choice is the highest-probability option; probabilities sum to 1; confidence measures concentration of the distribution, not biological correctness"
+   },
+   "score": {
+    "request": [
+     "type",
+     "instructions",
+     "criteria"
+    ],
+    "criteria_shape": "ordered array of 2-10 level descriptions",
+    "response": [
+     "type",
+     "score",
+     "legend",
+     "probabilities",
+     "confidence"
+    ],
+    "semantics": "score is the probability-weighted mean level index, an ordered rubric position, never a concentration or a rate",
+    "authoring_rule": "describe situations, not degrees"
+   },
+   "noul": {
+    "request": [
+     "type",
+     "instructions",
+     "criteria?"
+    ],
+    "criteria_shape": "optional object with true and false descriptions",
+    "response": [
+     "type",
+     "noul"
+    ],
+    "semantics": "noul is P(yes); there is no separate confidence because a two-outcome distribution is fully described by one number; a value near 0.5 does not mean intermediate biological intensity"
+   }
+  },
+  "state_projection": {
+   "policy": "This rulebook is NEVER sent to Jev. The engine builds a small `state` object per decision from the cell record, the rule's required_conditions and the measured context. The rulebook supplies the vocabulary, not the payload.",
+   "target_tokens": 700,
+   "hard_cap_tokens": 2000,
+   "always_include": [
+    "cell.id",
+    "cell.identity_candidates and identity_agreement",
+    "cell.region (candidate, core, tls_stage with its evidence caveat, distance to tumour core)",
+    "cell.qc.n_genes_by_counts and depth_decile_within_type",
+    "contacts: partner identity candidates, interface_um, gap_um, ordered by interface",
+    "engine.allowed_actions",
+    "engine.excluded_actions_with_reason",
+    "engine.decision_horizon",
+    "interpretation.probability_meaning",
+    "interpretation.assumed_competence_profile"
+   ],
+   "include_when_relevant": [
+    "signature percentiles for the signatures the rule's modulators name, each with its coverage_flag",
+    "genes_detected restricted to the genes the rule names, with spillover flags",
+    "neighbourhood_30um counts, only for a soluble-signalling question",
+    "active perturbation fields and their dimensionless values"
+   ],
+   "never_include": [
+    "raw UCell values without their percentile and coverage_flag",
+    "the full 302-gene detection vector",
+    "any field whose measurability is unobservable_by_design presented as observed",
+    "literature citations, rule text, or this rulebook"
+   ],
+   "excluded_actions_rationale": "Every action removed from the candidate set is listed with its reason, so a reviewer can tell whether an action was judged implausible or never offered. Changing the candidate set changes Choice probabilities even when biological state is identical."
+  },
+  "call_policy": {
+   "when_to_call": "Only for cells whose admissible set has more than one option after the engine has checked eligibility. Quiescent cells retain state and cost nothing.",
+   "measured_load_patch_LUAD3_B26": {
+    "n_cells": 1000,
+    "cells_with_heterotypic_contact": 866,
+    "note": "866 is an upper bound on cells with a non-trivial contact decision; the actual per-tick call count is lower because most heterotypic interfaces have no eligible rule."
+   },
+   "batching": "Independent questions for one cell share one request. Their answers do not condition on each other; when a second judgement needs the first answer, use a sequential step or an explicitly stated hypothetical premise.",
+   "one_request_per_cell": true,
+   "concurrency_guidance": "At 70-500 ms per request, 1,000 cells at 32-way concurrency is roughly 3-16 s per tick. Gate calls by eligibility before scaling concurrency.",
+   "failure_policy": "An API failure triggers a declared fallback: a deterministic admissible policy or maintenance. It must not silently erase a damage event or freeze the biological clock.",
+   "validation": "Check that returned probability keys match the submitted options, that values lie in [0,1] and sum to approximately 1, and that the returned model identifier is recorded."
+  },
+  "audit_record": {
+   "required_fields": [
+    "cell_id",
+    "tick",
+    "rulebook_version",
+    "calibration_version",
+    "patch_id",
+    "rule_id",
+    "decision_domain",
+    "state_hash",
+    "model_requested",
+    "model_returned",
+    "eligible_options",
+    "excluded_options_with_reason",
+    "selected_option",
+    "model_option_probabilities",
+    "model_confidence",
+    "identity_agreement",
+    "assumed_competence_profile",
+    "active_perturbations",
+    "score_use_flags",
+    "applied",
+    "engine_validation_passed",
+    "random_seed"
+   ],
+   "separability": "Runs whose decisions were made under identity conflict, under an assumed_competence_profile, or under any perturbation must be reportable separately from a baseline run."
+  }
+ },
+ "validation_requirements": {
+  "consistency": [
+   "No division of dead cells.",
+   "No CD8 attack without contact and declared recognition.",
+   "No incompatible lineage transition.",
+   "No debris consumed twice.",
+   "No negative resources.",
+   "Unassayed receptors remain unknown.",
+   "A candidate TLS with insufficient markers remains indeterminate."
+  ],
+  "independent_axis": {
+   "description": "The contact graph comes from segmentation, not from the annotation or the TLS pipeline, so reproducing it is a genuine test.",
+   "targets": {
+    "mean_contacts_per_cell": 6.11,
+    "homotypic_enrichment": {
+     "Tumor": 4.6,
+     "Tumor_proliferating": 21.58,
+     "B_cell": 4.98,
+     "CAF": 4.63,
+     "T_CD8_cytotoxic": 2.99
+    },
+    "caf_tumor_interface_share": 0.208
+   }
+  },
+  "circularity_traps": [
+   "Do not validate TLS structure against B-cell enrichment: the candidate cores ARE the first_type == B_cell mask.",
+   "Do not validate Tumor_proliferating against the mitotic-cell-cycle score: the label was defined from cycle genes, and the test fails anyway.",
+   "Do not validate against the 30 um neighbourhood, which is a derived quantity with no independent status."
+  ],
+  "depth_matched_null": "Before reporting any spatial or regional difference in a signature, repeat the comparison after matching cells on detection-depth decile within cell type.",
+  "temporal_prediction": "A single cross-sectional section supplies no ground-truth next state. Hiding part of the section tests spatial interpolation, not temporal prediction."
+ },
+ "open_parameters": [
+  {
+   "parameter": "cognate antigen recognition",
+   "status": "unobservable_by_design",
+   "needed": "V(D)J or antigen-specific assay"
+  },
+  {
+   "parameter": "cytokine concentrations and secretion rates",
+   "status": "unmeasured",
+   "needed": "protein or secretion assay; most receptors are not_assayed"
+  },
+  {
+   "parameter": "pO2, glucose, lactate, pH, perfusion",
+   "status": "unmeasured",
+   "needed": "physiological imaging"
+  },
+  {
+   "parameter": "migration, division and death rates",
+   "status": "uncalibrated",
+   "needed": "live tumour slices or repeated imaging"
+  },
+  {
+   "parameter": "cell ontogeny",
+   "status": "unknown",
+   "needed": "lineage tracing"
+  },
+  {
+   "parameter": "genotype, stage, treatment, histological pattern",
+   "status": "absent from the object",
+   "needed": "clinical metadata"
+  },
+  {
+   "parameter": "cell-death state",
+   "status": "not represented",
+   "needed": "a death marker; dead cells are under-segmented by construction"
+  },
+  {
+   "parameter": "TLS maturity as a per-cell state",
+   "status": "label present, no correlate",
+   "needed": "FDC network, protein, AICDA/BCL6"
+  },
+  {
+   "parameter": "contact area in 3-D",
+   "status": "unknown",
+   "needed": "serial sections or 3-D segmentation"
+  },
+  {
+   "parameter": "Jev option-probability to event-rate mapping",
+   "status": "not estimated",
+   "needed": "defined outcomes, horizons and independent calibration"
+  }
+ ]
+}
