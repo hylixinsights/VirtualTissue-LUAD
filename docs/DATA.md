@@ -1,5 +1,7 @@
 # Data, provenance and reconstruction
 
+The [README provenance and credit section](../README.md#dataset-provenance-and-credit) records the original-dataset attribution fields, and its [annotation](../README.md#how-the-cells-were-annotated) and [TLS methods](../README.md#how-tls-candidates-were-identified) sections distinguish documented steps from information still to be supplied. Unresolved fields are marked `[add here this info]`.
+
 This project uses one supplied human LUAD3 Xenium section: 133,464 annotated cells, 150,055 segmentation polygons, 302 panel genes and 44,134 scored cells. The raw delivery is intentionally outside the project directory. A new checkout requires authorized access to those inputs; no public download URL or redistribution permission is inferred here.
 
 Required local files:
@@ -29,4 +31,4 @@ Expression evidence uses positive entries in `purified_raw`, respecting sparse-m
 
 Scores are observations at the initial time, not dynamic pathway concentrations. Percentile by cell type is descriptive. Depth residual is raw minus the stored type/depth-decile median. Original coverage flags remain available alongside the stricter operational flag. The small panel and lineage confounding prevent any score from being sufficient evidence by itself. Layer-sensitive HLA observations and anomalous marker patterns documented in the manual remain limitations; this runtime does not infer antigen recognition or protein competence from them.
 
-`outputs/atlas_B*.json.gz` contains per-cell experimental derivatives and is ignored by Git. `outputs/audit_B*.json` records reconstruction metadata, input hashes and baseline rule summaries. Private episodes are also ignored. The allowlisted release contains aggregated calibration and the supplied rulebook/manual, but excludes raw input, per-cell examples, atlases and episodes. Review data terms before changing that boundary for publication.
+`outputs/atlas_B*.json.gz` contains per-cell experimental derivatives and is ignored by Git. `outputs/audit_B*.json` records reconstruction metadata, input hashes and baseline rule summaries. Private episodes are also ignored. The source-only archive excludes raw inputs, per-cell examples, reconstructed atlases and episodes. The separately selected replay published in `site/` includes its matching atlas and recorded per-cell observations, with provenance in `site/provenance.json`; it is not an anonymized or aggregate-only export. Raw inputs, unselected recordings and API journals remain excluded. Original-dataset credit and reuse terms apply to the selected derivatives as well.

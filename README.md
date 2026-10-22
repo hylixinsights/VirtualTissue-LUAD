@@ -1,12 +1,92 @@
 # LUAD Tissue Studio
 
-Repository destination: [hylixinsights/VirtualTissue-LUAD](https://github.com/hylixinsights/VirtualTissue-LUAD). The 30 September Jev campaign completed 72 modeled hours: 1,059 new requests, 1,060 cumulatively against the authorized 5,000 ceiling, and 17,071 individual decisions. See [the recorded campaign](docs/JEV_CAMPAIGN_5000.md). [Lessons from VirtualTissue-LN](docs/LN_REVIEW.md) informed event chapters and the static publication package. These additions preserve the calibrated simulation kernel.
+Repository: [hylixinsights/VirtualTissue-LUAD](https://github.com/hylixinsights/VirtualTissue-LUAD). The 30 September Jev campaign completed 72 modeled hours: 1,059 new requests, 1,060 cumulatively against the authorized 5,000 ceiling, and 17,071 individual decisions. See [the recorded campaign](docs/JEV_CAMPAIGN_5000.md). [Lessons from VirtualTissue-LN](docs/LN_REVIEW.md) informed event chapters and the static publication package. These additions preserve the calibrated simulation kernel.
 
 The prepared repository includes the selected replay in `site/`. Serve that folder with any static web server to inspect the tissue without raw inputs, Python simulation or an inference key. See [upload and Pages instructions](docs/GITHUB_RELEASE.md) for the locally prepared release; no publication was performed by the recorder.
 
 A Xenium-initialized atlas and individual-cell simulation for one human lung adenocarcinoma section. Explore measured B26/B27 polygons, competing cell annotations and pathway signatures, then follow autonomous cells through declared mechanical and biological programs.
 
 **Version 0.2.1 adds structural compression constraints derived from the measured nucleus/cell area ratios and a persistent whole-campaign Jev budget.** It retains moving cells, reaction–diffusion fields, gated programs, wake scheduling, recorded comparisons and offline replay. New experiments use `contracts/runtime-v2-calibrated.json`; the original contracts and recordings remain available. The live smoke test validated 20 questions in one request. See [calibration and limits](docs/CALIBRATION.md), [campaign results](docs/CALIBRATION_RESULTS.md), the [autonomous runtime](docs/AUTONOMOUS_RUNTIME.md) and [verification](docs/VERIFICATION.md). Structural calibration does not identify patient kinetics or treatment response.
+
+## Dataset provenance and credit
+
+The experimental starting point is **one human lung adenocarcinoma section, locally identified as LUAD3, measured with the 10x Genomics Xenium platform**. Credit for collecting the specimen and generating the original experimental dataset belongs to the original investigators and data providers listed below. This repository contributes a tissue reconstruction, a rule-based simulation and a recorded experiment built from those observations.
+
+**Documentation in progress:** `[add here this info]` marks information that could not be established from the supplied files. Replace each placeholder with the verified information; the surrounding field identifies what is needed. The filename `LUAD3` and the platform name do not identify an original publication or accession.
+
+| Original dataset credit | Information |
+|---|---|
+| Dataset creators, contributing laboratories and institutions | [add here this info] |
+| Full original dataset/publication citation, including DOI | [add here this info] |
+| Official dataset URL, accession and release/version used | [add here this info] |
+| Mapping of the local identifier LUAD3 to the original sample/slide identifier | [add here this info] |
+| Specimen preparation and available clinical/histological description | [add here this info] |
+| Xenium panel name/version, processing software and segmentation version/settings | [add here this info] |
+| Dataset reuse terms and required acknowledgments | [add here this info] |
+
+The supplied analysis object is `LUAD3_TLS_GO20_UCell.h5ad`, derived from `Xenium_LUAD_No3_annotated.h5ad`; `cell_boundaries.csv` supplies segmentation polygons. The analysis object contains **133,464 annotated cells and 302 genes**. The boundary file contains **150,055 polygons**, including objects without a matching retained annotated cell. Twenty signature scores are available for **44,134 cells** assigned to the 28 candidate regions. These are different denominators and should not be interchanged. Input hashes and reconstruction details are in [data provenance](docs/DATA.md).
+
+The raw inputs are not included in this repository. The selected replay in `site/` does contain derived per-cell geometry, annotations and recorded observations; it is not an anonymized or aggregate-only dataset. Credit to the source investigators applies to these derivatives as well.
+
+## How the cells were annotated
+
+The simulation imports annotations already present in the supplied AnnData object. It does not perform a new cell-type annotation, and Jev does not assign cell identities. The available object establishes the following relationships between the annotation columns; the upstream methods still need to be completed:
+
+| Annotation field | What is documented | Method to complete |
+|---|---|---|
+| `first_type` | A separate annotation vocabulary; the upstream GO-score delivery calls this its primary annotation. | Annotation method, reference atlas or marker panel, software/model version and parameters: [add here this info] |
+| `leiden` and `cell_type` | The same ten-group partition is stored as cluster IDs and cell-type labels. | Expression preprocessing, feature selection, software versions and cluster-to-type labeling criteria: [add here this info] |
+| `cell_type_fine` | Refines `cell_type` within the T-cell compartment: 3,756 labels change from CD4 to cytotoxic CD8 and 91 in the reverse direction. This is the first identity candidate used in the simulation atlas and the label source for the patch counts below. | CD4/CD8 refinement method, marker thresholds, supporting reference and manual corrections: [add here this info] |
+
+The stored `uns['leiden']['params']` records `resolution=1.0`, `random_state=0` and `n_iterations=2`. The stored `uns['neighbors']['params']` records `n_neighbors=10`, `n_pcs=30`, `metric='euclidean'`, `method='umap'` and `random_state=0`. These metadata do not establish the complete preprocessing or manual labeling workflow, and they are not evidence for the graph settings used in spatial TLS detection.
+
+Upstream quality-control thresholds and filtering steps: [add here this info]. The expression layer `purified_raw` is described in the supplied provenance as **SPLIT-corrected**; the SPLIT implementation, citation, version and parameters are: [add here this info]. Annotation contributors and independent/manual validation are: [add here this info].
+
+Both `cell_type_fine` and `first_type` are retained for each annotated cell. The atlas records exact agreement, agreement after lineage mapping, or a conflict. Different vocabularies are not automatically treated as biological disagreement, and conflicting labels are not silently replaced. Physical objects without an annotation remain present as context objects without autonomous programs. The identity assumptions of a simulation scenario are recorded separately from these measured labels; see [the identity audit](MANUAL.md#4-cell-identity-is-a-set-not-a-label) and [operational corrections](docs/CONTRACT_CORRECTIONS.md).
+
+Cell IDs join annotations to segmentation polygons. `obsm['spatial']` contains coordinates in micrometres aligned with the boundary file; the source's X-mirrored coordinates are retained in `obsm['spatial_original']` and are not used for this reconstruction.
+
+## How TLS candidates were identified
+
+The supplied analysis contains **28 geodesic TLS candidate regions**, imported from the upstream `tissue_candidate_assignment.csv` by `cell_id`. The H5AD retains `geodesic_candidate_id` and `is_candidate_core`, as well as `TLS_stage`, `TLS_stage_name` and `TLS_class`. The virtual-tissue builder consumes these assignments; it does not rediscover TLS from a simulated trajectory.
+
+The candidate regions contain **18,879 core cells and 25,255 surrounding cells**. All delivered core cells are labeled `B_cell` under `first_type`. This describes the supplied mask and is not independent validation of a B-cell-rich structure. The full detection procedure cannot be recovered from the resulting masks alone:
+
+| Upstream TLS analysis step | Details to complete |
+|---|---|
+| Candidate-core detection | Cell labels/markers used, algorithm, thresholds and minimum size: [add here this info] |
+| Neighborhood graph and geodesic expansion | Edge definition, distance metric, expansion limits and handling of overlapping regions: [add here this info] |
+| Tumor-core annotation | Method and thresholds used to identify the tumor cores associated with the TLS analysis: [add here this info] |
+| TLS stage assignment and independent validation | Criteria for early aggregate, primary follicle and mature labels; histology, staining or expert review, if performed: [add here this info] |
+| Analysis provenance and credit | Contributors, software versions and source scripts/notebooks: [add here this info] |
+
+The delivered `TLS_stage_name` labels comprise **12 mature, 15 primary-follicle and one early-aggregate core**. These remain supplied architectural labels. `TLS_stage` and `TLS_stage_name` are not interchangeable encodings in this object. The simulation records maturity as `delivered_label_uncorroborated`; these labels alone do not establish a functional germinal center or authorize a cellular behavior. See [the TLS audit](MANUAL.md#7-tertiary-lymphoid-structures).
+
+### How B26 was selected for the simulation
+
+TLS detection and simulation-window selection are separate steps. After the 28 candidate cores had been supplied, windows of **1,000 annotated cells** around those cores were surveyed. For a selected candidate, the atlas builder takes the mean of its core-cell spatial coordinates and selects the 1,000 nearest annotated cells from the section. It then reconstructs the selected cells' polygons and their contacts. A measured contact is defined by a polygon-to-polygon gap of **at most 1 µm**; a nearby centroid alone is not a contact.
+
+**B26 was chosen for the TLS–tumor interface experiment:** its approximately **324 × 321 µm** window contains a supplied primary-follicle core next to a tumor nest, with **19 CD8–tumor contact pairs involving 10 distinct CD8 cells**. **B27** is the secondary window for tumor–stroma questions because it contains **183 CAF–tumor contacts**.
+
+| Initial 1,000-cell simulation window | B26 | B27 |
+|---|---:|---:|
+| B cells | 381 | 155 |
+| Cytotoxic CD8 labels | 205 | 73 |
+| Tumor labels, including proliferating tumor | 139 | 236 |
+| CD8–tumor contact pairs | 19 | 2 |
+| CAF–tumor contact pairs | 45 | 183 |
+
+These windows are not the complete geodesic candidate regions: the upstream B26 region contains 1,104 cells and B27 contains 576, whereas each simulation ROI contains 1,000 cells selected around its core. An additional 30 µm polygon halo preserves boundary context, adding 441 objects for B26 and 328 for B27 outside the ROI denominator. Context objects remain distinct from autonomous ROI cells. Selection was designed to study particular interfaces; these windows are not an unbiased sample of the whole section. The measurements and scan are documented in [the patch specification](MANUAL.md#11-the-simulation-patch) and [the atlas builder](src/luad_tissue/atlas.py).
+
+## Pathway signatures and method attribution
+
+The supplied score analysis used **20 human MSigDB 2026.1.Hs C5:GO:BP gene sets**, selected for biological relevance and at least five panel genes before candidate scores were compared. The C5:GO:BP collection derives from the Gene Ontology Biological Process resource; see [MSigDB collections and acknowledgments](https://www.gsea-msigdb.org/gsea/msigdb/human/collections.jsp#C5).
+
+Scores were computed with **pyUCell 0.7.3** on `purified_raw`, using `max_rank=100`, `ties_method='average'` and `missing_genes='skip'`, on CPU, without smoothing or additional normalization. Each cell was ranked against the 302 panel genes; only the gene-set/panel intersection contributed. Unscored cells retain missing values rather than zero. These are rank-based signature scores, not enrichment p-values, NES values or measurements of pathway flux. The supplied manual documents panel coverage, cell-type confounding and detection-depth effects; [calibration](docs/CALIBRATION.md) describes their use and limitations in the simulation.
+
+Please credit **Massimo Andreatta and Santiago J. Carmona** for [UCell (2021)](https://doi.org/10.1016/j.csbj.2021.06.043) and [UCell and pyUCell (2026)](https://doi.org/10.1093/bioinformatics/btag055), as specified in the [official pyUCell citation guidance](https://pyucell.readthedocs.io/en/latest/#citation). The supplied analysis documentation names `analysis/pathway_scores_go20.py` as the scoring entry point and `tmp/pathway_scores_go20/export_go20.mjs` as the table exporter. Contributors and the repository/commit containing those upstream scripts: [add here this info]. These method citations are separate from the original experimental dataset citation above.
+
+Concept and biological direction are credited to **Helder Nakaya, CSBL / Hylix.app**, and implementation assistance to **OpenAI Codex**, as recorded in [NOTICE.md](NOTICE.md). Original data generation, upstream annotation and TLS analysis require their own contributor credits in the fields above. The supplied [biological manual](MANUAL.md) preserves the literature references used to formulate the simulation rules.
 
 ## What is available
 
